@@ -1,0 +1,362 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USERS & AUTH ─────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  avatar        String?
+  role          UserRole  @default(MEMBER)
+  year          Int?      // 1-4
+  branch        String?
+  githubUrl     String?
+  linkedinUrl   String?
+  skills        String[]  // Array of skill tags
+
+  // Gamification
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  streakDays    Int       @default(0)
+  lastActive    DateTime  @default(now())
+
+  // Relations
+  team          Team?     @relation(fields: [teamId], references: [id])
+  teamId        String?
+  isTeamLeader  Boolean   @default(false)
+
+  forumPosts    ForumPost[]
+  forumAnswers  ForumAnswer[]
+  votes         Vote[]
+  progressLogs  ProgressLog[]
+  notifications Notification[]
+  achievements  UserAchievement[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum UserRole {
+  COORDINATOR
+  TEAM_LEADER
+  MEMBER
+}
+
+// ─── TEAMS ──────────────────────────────────────────────────────
+model Team {
+  id            String    @id @default(cuid())
+  name          String
+  code          String    @unique // EYRC-CSE-01
+  description   String?
+
+  // Theme preferences & assignment
+  preferredTheme1 String?
+  preferredTheme2 String?
+  assignedTheme   String?   // Final assigned theme
+  committedTheme  String?   // From Task 3 onwards
+
+  // Progress
+  currentStage    Stage     @default(STAGE_1)
+  currentTask     String    @default("TASK_0")
+  progressPercent Int       @default(0)
+
+  // Gamification
+  totalXp         Int       @default(0)
+  rank            Int?
+
+  // Relations
+  members         User[]
+  tasks           Task[]
+  progressLogs    ProgressLog[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum Stage {
+  STAGE_1
+  STAGE_2
+  FINALE
+}
+
+// ─── TASKS ──────────────────────────────────────────────────────
+model Task {
+  id            String      @id @default(cuid())
+  title         String
+  description   String?
+  stage         Stage
+  taskNumber    String      // TASK_0, TASK_1, etc.
+  themeCode     String?     // Optional theme-specific task
+
+  deadline      DateTime?
+  maxXp         Int         @default(100)
+
+  // Relations
+  team          Team        @relation(fields: [teamId], references: [id])
+  teamId        String
+
+  status        TaskStatus  @default(NOT_STARTED)
+  submissionUrl String?
+  submissionNotes String?
+  submittedAt   DateTime?
+  completedAt   DateTime?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  BLOCKED
+}
+
+// ─── THEMES & ROADMAPS ─────────────────────────────────────────
+model Theme {
+  id            String    @id @default(cuid())
+  code          String    @unique // LQ, KD, SC, HE, NV, EB, PB
+  name          String
+  tagline       String
+  description   String    @db.Text
+  difficulty    Difficulty
+  years         Int[]     // [1,2,3,4] eligible years
+  mode          String    // "Simulator + Hardware"
+
+  techStack     String[]  // ["ROS2", "OpenCV", "SLAM"]
+  objectives    Json      // Array of objective objects
+
+  // Relations
+  roadmaps      RoadmapNode[]
+  resources     Resource[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model RoadmapNode {
+  id            String    @id @default(cuid())
+  theme         Theme     @relation(fields: [themeId], references: [id])
+  themeId       String
+
+  title         String
+  description   String?
+  weekNumber    Int
+  estimatedHours Int
+
+  resources     Resource[]
+  prerequisites String[]  // IDs of prerequisite nodes
+
+  createdAt     DateTime  @default(now())
+}
+
+model Resource {
+  id            String    @id @default(cuid())
+  title         String
+  type          ResourceType
+  url           String?
+  content       String?   @db.Text // For inline text resources
+
+  theme         Theme?    @relation(fields: [themeId], references: [id])
+  themeId       String?
+  roadmapNode   RoadmapNode? @relation(fields: [roadmapNodeId], references: [id])
+  roadmapNodeId String?
+
+  tags          String[]
+  createdAt     DateTime  @default(now())
+}
+
+enum ResourceType {
+  VIDEO
+  ARTICLE
+  DOCUMENTATION
+  CODE_TEMPLATE
+  CHEAT_SHEET
+  PDF
+  LINK
+}
+
+// ─── FORUM ──────────────────────────────────────────────────────
+model ForumPost {
+  id            String    @id @default(cuid())
+  title         String
+  content       String    @db.Text
+
+  author        User      @relation(fields: [authorId], references: [id])
+  authorId      String
+  isAnonymous   Boolean   @default(false)
+
+  themeTag      String?   // e.g., "PB", "ROS2"
+  category      ForumCategory @default(GENERAL)
+  urgency       Urgency   @default(LOW)
+
+  views         Int       @default(0)
+  upvotes       Int       @default(0)
+  isSolved      Boolean   @default(false)
+  bestAnswerId  String?   @unique
+
+  answers       ForumAnswer[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum ForumCategory {
+  CONCEPT
+  CODE_BUG
+  HARDWARE
+  SUBMISSION
+  GENERAL
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  BLOCKER
+}
+
+model ForumAnswer {
+  id            String    @id @default(cuid())
+  content       String    @db.Text
+
+  author        User      @relation(fields: [authorId], references: [id])
+  authorId      String
+
+  post          ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        String
+
+  isBestAnswer  Boolean   @default(false)
+  upvotes       Int       @default(0)
+
+  votes         Vote[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Vote {
+  id            String    @id @default(cuid())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  answer        ForumAnswer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  answerId      String
+  type          VoteType
+
+  createdAt     DateTime  @default(now())
+
+  @@unique([userId, answerId])
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+// ─── GAMIFICATION ───────────────────────────────────────────────
+model Achievement {
+  id            String    @id @default(cuid())
+  code          String    @unique // e.g., "first_blood"
+  name          String
+  description   String
+  icon          String    // Lucide icon name or URL
+  xpBonus       Int       @default(0)
+  conditionType String    // "task_count", "answer_count", "streak", etc.
+  conditionValue Int
+
+  users         UserAchievement[]
+
+  createdAt     DateTime  @default(now())
+}
+
+model UserAchievement {
+  id            String    @id @default(cuid())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  achievementId String
+  earnedAt      DateTime  @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model XpLog {
+  id            String    @id @default(cuid())
+  userId        String
+  teamId        String?
+  amount        Int
+  reason        String    // "task_submitted", "best_answer", etc.
+  metadata      Json?     // Additional context
+  createdAt     DateTime  @default(now())
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────────────
+model Notification {
+  id            String    @id @default(cuid())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  type          NotificationType
+  title         String
+  message       String
+  link          String?
+  isRead        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+enum NotificationType {
+  TASK_DEADLINE
+  TASK_COMPLETED
+  FORUM_REPLY
+  BEST_ANSWER
+  ACHIEVEMENT_UNLOCKED
+  ANNOUNCEMENT
+  TEAM_INVITE
+  MENTION
+}
+
+// ─── PROGRESS LOGS ──────────────────────────────────────────────
+model ProgressLog {
+  id            String    @id @default(cuid())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  team          Team      @relation(fields: [teamId], references: [id])
+  teamId        String
+
+  action        String    // "task_started", "resource_viewed", "module_completed"
+  details       Json?
+  xpEarned      Int       @default(0)
+
+  createdAt     DateTime  @default(now())
+}
+
+// ─── ANNOUNCEMENTS ──────────────────────────────────────────────
+model Announcement {
+  id            String    @id @default(cuid())
+  title         String
+  content       String    @db.Text
+  target        AnnouncementTarget @default(ALL)
+  themeCode     String?   // If theme-specific
+  isPinned      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+enum AnnouncementTarget {
+  ALL
+  COORDINATORS
+  TEAM_LEADERS
+  THEME_SPECIFIC
+}
