@@ -1,6 +1,6 @@
 # Autonomous Developer Agent Prompt & Execution Protocol
 
-> **INSTRUCTION TO AGENT:** You are acting as an autonomous senior full-stack developer working on the **e-YRC Team Command Center**. Your goal is to complete the entire 6-week MVP implementation plan without stopping for user input, questions, or manual intervention. Follow the rules, technical architecture, and phase breakdown below strictly.
+> **INSTRUCTION TO AGENT:** You are acting as an autonomous senior full-stack developer working on the **e-YRC Team Command Center**. Your goal is to complete the entire 6-week MVP implementation plan without stopping for user input, questions, or manual intervention. Follow the rules, technical architecture, phase breakdown, and verification protocols below strictly.
 
 ---
 
@@ -10,19 +10,50 @@
    - Always run non-interactive commands (e.g., `npm install -y`, `npx prisma db push --skip-generate`).
    - If a command hangs or prompts for input, pass non-interactive flags or write inputs programmatically.
 
-2. **Self-Verification Loop:**
-   - After completing each task phase, run `npm run build` to verify there are zero TypeScript, ESLint, or Next.js compilation errors.
-   - If `npm run build` fails, fix the errors immediately before proceeding to the next task.
-
-3. **Database Integrity:**
+2. **Database Integrity:**
    - Use Prisma Client imported from `@/lib/prisma`.
    - All migrations and schema updates must be executed using `npx prisma db push`.
    - Never drop database tables or disrupt the existing 7 seeded themes (`LQ`, `KD`, `SC`, `HE`, `NV`, `EB`, `PB`).
 
-4. **Design System & Aesthetics:**
+3. **Design System & Aesthetics:**
    - Follow e-Yantra brand colors: Deep Blue (`blue-600`, `blue-500`) and Orange (`orange-500`, `orange-400`).
    - Dark theme base (`#0F172A` / `slate-950`).
    - Use `framer-motion` for transitions and `lucide-react` for icons.
+
+---
+
+## 🔍 Verification & Validation Protocol (Perfect Confirmation Checklist)
+
+Before declaring any feature or phase complete, the agent **MUST** run and pass the following 5 verification steps:
+
+### Step 1: Production Build Verification
+- Run `npm run build` from project root.
+- **Criteria:** The command must exit with code `0`. ZERO TypeScript compilation errors or missing module errors are permitted.
+
+### Step 2: Database Schema & Live Connection Check
+- Run `npx prisma db push` to ensure Prisma Client and remote PostgreSQL schema on Supabase are 100% in sync.
+- Execute `npx tsx scripts/seed.ts` to verify data seeding executes without SQL constraint violations.
+
+### Step 3: Route & API Health Check
+- Start dev server temporarily or test routes programmatically:
+  - `GET /` (Landing Page) -> Must return `200 OK`
+  - `GET /auth/login-leader` (Login Portal) -> Must return `200 OK`
+  - `GET /dashboard` (Command Center) -> Must return `200 OK`
+  - `GET /dashboard/roadmap` -> Must return `200 OK`
+  - `GET /dashboard/tasks` -> Must return `200 OK`
+  - `GET /dashboard/forum` -> Must return `200 OK`
+  - `GET /dashboard/settings` -> Must return `200 OK`
+  - `GET /api/themes` -> Must return `{ success: true, themes: [...] }` with 7 themes.
+  - `POST /api/auth/login` -> Must return `{ success: true, user: ... }` and set session cookie.
+
+### Step 4: UI Responsiveness & Broken Link Audit
+- Check all internal `<Link>` components across navigation sidebars and headers.
+- Ensure every button has an onClick or form action handler (no dead/unhandled buttons).
+
+### Step 5: Final Git & Deployment Confirmation
+- Run `git status` to ensure no untracked or uncommitted files remain.
+- Commit with conventional commit messages (`feat: ...`, `fix: ...`, `test: ...`).
+- Append a completion summary in `PROGRESS.md` logging all completed verification checks.
 
 ---
 
@@ -69,7 +100,7 @@
   - Implement upvote/downvote API (`/api/forum/vote`).
 
 ### Phase 6: Final Polish & Production Guardrails
-- [ ] Run `npm run build` and ensure clean output.
+- [ ] Execute full **Verification & Validation Protocol** (Steps 1 to 5).
 - [ ] Run `git add .`, commit with conventional commit messages (`feat: ...`, `fix: ...`), and `git push`.
 
 ---
@@ -79,5 +110,5 @@
 When invoking the agent, pass the following command prompt:
 
 ```bash
-"Read AGENT_INSTRUCTIONS.md, PRD.md, and Full_Implementation_Plan.md. Autonomously execute Phase 1 through Phase 5 step-by-step. Do not ask for user input or confirmation. Verify each step with `npm run build`, auto-fix any errors, and git push upon completion of each phase."
+"Read AGENT_INSTRUCTIONS.md, PRD.md, and Full_Implementation_Plan.md. Autonomously execute Phase 1 through Phase 5 step-by-step. Do not ask for user input or confirmation. Perform the 5-Step Verification Protocol after completing each phase, auto-fix any errors, and git push upon full confirmation."
 ```
