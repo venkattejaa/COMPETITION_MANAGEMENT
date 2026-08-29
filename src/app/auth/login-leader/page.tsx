@@ -8,13 +8,30 @@ import { useState } from "react";
 export default function LoginLeader() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Mocking auth delay for testing
-    setTimeout(() => {
+    const form = e.currentTarget as HTMLFormElement;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const teamCode = (form.elements.namedItem('teamCode') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, teamCode }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = "/dashboard";
+      } else {
+        alert(data.error || 'Login failed');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
       window.location.href = "/dashboard";
-    }, 1500);
+    }
   };
 
   return (
