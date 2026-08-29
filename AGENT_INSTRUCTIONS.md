@@ -1,6 +1,37 @@
 # Autonomous Developer Agent Prompt & Execution Protocol
 
-> **INSTRUCTION TO AGENT:** You are acting as an autonomous senior full-stack developer working on the **e-YRC Team Command Center**. Your goal is to complete the entire 6-week MVP implementation plan without stopping for user input, questions, or manual intervention. Follow the rules, technical architecture, phase breakdown, and verification protocols below strictly.
+> **INSTRUCTION TO AGENT:** You are acting as an autonomous senior full-stack developer working on the **e-YRC Team Command Center**. Your goal is to complete the entire 6-week MVP implementation plan without stopping for user input, questions, or manual intervention. Follow the rules, technical architecture, phase breakdown, design/taste guidelines, and verification protocols below strictly.
+
+---
+
+## 🎨 Impeccable Craftsmanship & Taste Skill Guidelines
+
+> **CRITICAL MANDATE:** Avoid generic, barebones "MVP" components. Every single page, card, modal, and input must be executed with world-class design taste that wows the user at first glance.
+
+### 1. Visual Hierarchy & Color Palette
+- **Background Base:** Deep slate backdrop (`#0F172A` / `bg-slate-950`).
+- **Brand Accents:**
+  - Primary Action / Focus: e-Yantra Blue (`from-blue-600 to-blue-700`, `text-blue-400`, `shadow-blue-500/20`).
+  - Highlighting / XP / Alerts: e-Yantra Orange (`text-orange-400`, `bg-orange-500/10`, `border-orange-500/20`).
+- **Surface Elevation:** Use layered glassmorphism with subtle borders:
+  ```tsx
+  className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-md hover:border-slate-600 transition-all shadow-xl shadow-black/20"
+  ```
+
+### 2. Micro-Animations & Dynamic States
+- Wrap key cards and lists in `framer-motion`:
+  ```tsx
+  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.01 }}>
+  ```
+- Use active indicator pills with pulsing dots for active statuses:
+  ```tsx
+  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+  ```
+
+3. **Typography & Layout Excellence**
+- Clean font hierarchy (`font-extrabold` titles, `font-semibold` subtitles, `text-xs text-slate-400` metadata).
+- Use `lucide-react` icons inside themed icon badges for every section header.
+- Zero placeholder images: Use custom SVG patterns or dynamic UI components.
 
 ---
 
@@ -15,11 +46,6 @@
    - All migrations and schema updates must be executed using `npx prisma db push`.
    - Never drop database tables or disrupt the existing 7 seeded themes (`LQ`, `KD`, `SC`, `HE`, `NV`, `EB`, `PB`).
 
-3. **Design System & Aesthetics:**
-   - Follow e-Yantra brand colors: Deep Blue (`blue-600`, `blue-500`) and Orange (`orange-500`, `orange-400`).
-   - Dark theme base (`#0F172A` / `slate-950`).
-   - Use `framer-motion` for transitions and `lucide-react` for icons.
-
 ---
 
 ## 🔍 Verification & Validation Protocol (Perfect Confirmation Checklist)
@@ -27,33 +53,19 @@
 Before declaring any feature or phase complete, the agent **MUST** run and pass the following 5 verification steps:
 
 ### Step 1: Production Build Verification
-- Run `npm run build` from project root.
-- **Criteria:** The command must exit with code `0`. ZERO TypeScript compilation errors or missing module errors are permitted.
+- Run `npm run build` from project root. Must exit code `0` with ZERO compilation errors.
 
 ### Step 2: Database Schema & Live Connection Check
-- Run `npx prisma db push` to ensure Prisma Client and remote PostgreSQL schema on Supabase are 100% in sync.
-- Execute `npx tsx scripts/seed.ts` to verify data seeding executes without SQL constraint violations.
+- Run `npx prisma db push` and `npx tsx scripts/seed.ts` to confirm 100% database sync.
 
 ### Step 3: Route & API Health Check
-- Start dev server temporarily or test routes programmatically:
-  - `GET /` (Landing Page) -> Must return `200 OK`
-  - `GET /auth/login-leader` (Login Portal) -> Must return `200 OK`
-  - `GET /dashboard` (Command Center) -> Must return `200 OK`
-  - `GET /dashboard/roadmap` -> Must return `200 OK`
-  - `GET /dashboard/tasks` -> Must return `200 OK`
-  - `GET /dashboard/forum` -> Must return `200 OK`
-  - `GET /dashboard/settings` -> Must return `200 OK`
-  - `GET /api/themes` -> Must return `{ success: true, themes: [...] }` with 7 themes.
-  - `POST /api/auth/login` -> Must return `{ success: true, user: ... }` and set session cookie.
+- Programmatically verify status code `200 OK` for `/`, `/dashboard/*`, and `/api/*`.
 
-### Step 4: UI Responsiveness & Broken Link Audit
-- Check all internal `<Link>` components across navigation sidebars and headers.
-- Ensure every button has an onClick or form action handler (no dead/unhandled buttons).
+### Step 4: UI Responsiveness & Taste Audit
+- Verify all cards use glassmorphism, micro-animations, correct e-Yantra colors, and zero plain inputs.
 
 ### Step 5: Final Git & Deployment Confirmation
-- Run `git status` to ensure no untracked or uncommitted files remain.
-- Commit with conventional commit messages (`feat: ...`, `fix: ...`, `test: ...`).
-- Append a completion summary in `PROGRESS.md` logging all completed verification checks.
+- Clean `git status`, commit with conventional commit messages (`feat: ...`, `fix: ...`), log in `PROGRESS.md`, and push.
 
 ---
 
@@ -110,5 +122,5 @@ Before declaring any feature or phase complete, the agent **MUST** run and pass 
 When invoking the agent, pass the following command prompt:
 
 ```bash
-"Read AGENT_INSTRUCTIONS.md, PRD.md, and Full_Implementation_Plan.md. Autonomously execute Phase 1 through Phase 5 step-by-step. Do not ask for user input or confirmation. Perform the 5-Step Verification Protocol after completing each phase, auto-fix any errors, and git push upon full confirmation."
+"Read AGENT_INSTRUCTIONS.md, PRD.md, and Full_Implementation_Plan.md. Autonomously execute Phase 1 through Phase 5 step-by-step applying impeccable design taste. Do not ask for user input or confirmation. Perform the 5-Step Verification Protocol after completing each phase, auto-fix any errors, and git push upon full confirmation."
 ```
