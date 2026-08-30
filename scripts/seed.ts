@@ -127,21 +127,23 @@ async function main() {
   ]
 
   for (const t of themes) {
-    await prisma.theme.upsert({
+    const { objectives, ...themeData } = t;
+    const createdTheme = await prisma.theme.upsert({
       where: { code: t.code },
       update: {},
       create: {
-        code: t.code,
-        name: t.name,
-        tagline: t.tagline,
-        description: t.description,
+        ...themeData,
         difficulty: t.difficulty as any,
-        years: t.years,
-        mode: t.mode,
-        techStack: t.techStack,
-        objectives: t.objectives,
       },
-    })
+    });
+
+    for (let i = 0; i < objectives.length; i++) {
+      await prisma.themeObjective.upsert({
+        where: { id: `${t.code}-obj-${i + 1}` },
+        update: { title: objectives[i], description: objectives[i], order: i + 1, themeId: createdTheme.id },
+        create: { id: `${t.code}-obj-${i + 1}`, title: objectives[i], description: objectives[i], order: i + 1, themeId: createdTheme.id },
+      });
+    }
   }
   
   console.log('Seeded themes successfully.')

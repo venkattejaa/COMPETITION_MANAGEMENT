@@ -132,14 +132,25 @@ model Theme {
   mode          String    // "Simulator + Hardware"
 
   techStack     String[]  // ["ROS2", "OpenCV", "SLAM"]
-  objectives    Json      // Array of objective objects
 
   // Relations
+  objectives    ThemeObjective[]
   roadmaps      RoadmapNode[]
   resources     Resource[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model ThemeObjective {
+  id          String  @id @default(cuid())
+  theme       Theme   @relation(fields: [themeId], references: [id])
+  themeId     String
+  title       String
+  description String
+  order       Int
+
+  createdAt   DateTime @default(now())
 }
 
 enum Difficulty {
@@ -360,4 +371,16 @@ enum AnnouncementTarget {
   COORDINATORS
   TEAM_LEADERS
   THEME_SPECIFIC
+}
+
+model TaskTemplate {
+  id          String  @id @default(cuid())
+  taskNumber  String  @unique // TASK_0, TASK_1, etc.
+  title       String
+  stage       Stage
+  maxXp       Int     @default(100)
+  description String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
