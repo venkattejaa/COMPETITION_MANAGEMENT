@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "./prisma";
 
@@ -17,6 +18,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
     }),
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) return null;
+        
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string }
+        });
+        
+        if (user) {
+          return user;
+        }
+        
+        // Auto-create user for development/demo if they don't exist
+        const newUser = await prisma.user.create({
+          data: {
+            email: credentials.email as string,
+            name: (credentials.email as string).split('@')[0],
+            role: "TEAM_LEADER",
+          }
+        });
+        
+        return newUser;
+      }
+    })
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -38,10 +68,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async session({ session, user }) {
-      if (session.user) {
+    async session({ session, token }) {
+      if (token && session.user) {
+        // Fetch fresh user data from DB using token ID to ensure session is up to date
         const dbUser = await prisma.user.findUnique({
-          where: { email: session.user.email! },
+          where: { id: token.id as string },
           include: { team: true },
         });
 
@@ -69,7 +100,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     error: "/login",
   },
   session: {
-    strategy: "database",
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "eyrc-command-center-super-secret-key-2026-production-token",
