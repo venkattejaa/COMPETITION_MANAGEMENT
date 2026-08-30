@@ -2,356 +2,252 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Bot, ArrowRight, Users, Trophy, BookOpen, Zap, Shield, Clock, CheckCircle, ArrowUpRight } from "lucide-react";
+import { Bot, ArrowRight, Users, Trophy, BookOpen, Zap, Shield, Clock, ArrowUpRight, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 const features = [
   {
     icon: Users,
-    title: "Team Management",
-    description: "Create teams, invite members, track progress, and manage theme assignments with automated workflows.",
+    title: "Team Command Center",
+    description: "Create teams, manage theme assignments, track student participation, and streamline coordinator workflows.",
   },
   {
     icon: BookOpen,
-    title: "Theme Roadmaps",
-    description: "Structured learning paths for all 7 eYRC themes with curated resources, milestones, and checkpoints.",
+    title: "6-Week Theme Roadmaps",
+    description: "Structured learning paths for all 7 eYRC competition themes with curated hardware/software checkpoints.",
   },
   {
     icon: Trophy,
-    title: "Gamified Progress",
-    description: "XP system, leaderboards, badges, and streaks to keep teams motivated throughout the competition.",
+    title: "Gamified XP Engine",
+    description: "XP points, live leaderboards, activity badges, and daily streaks to keep teams motivated till the Finale.",
   },
   {
     icon: Zap,
-    title: "Real-time Forum",
-    description: "Peer-to-peer Q&A with threaded discussions, voting, best answers, and instant notifications.",
+    title: "Real-time Q&A Forum",
+    description: "Peer-to-peer technical help with theme tags, upvoting, solution verification, and mentor answers.",
   },
   {
     icon: Shield,
-    title: "Coordinator Dashboard",
-    description: "Bird's-eye view of all teams, risk detection, bulk actions, and automated deadline alerts.",
+    title: "Coordinator Analytics",
+    description: "Bird's-eye view across all competing teams, progress monitoring, and automated deadline tracking.",
   },
   {
     icon: Clock,
-    title: "Timeline & Deadlines",
-    description: "Competition timeline visualization with countdown timers and milestone tracking.",
+    title: "Milestone Deadlines",
+    description: "Visual timeline and countdown timers for Stage 1, Stage 2, and the National Finale at IIT Bombay.",
   },
 ];
 
 const stats = [
   { value: "7", label: "eYRC Themes" },
-  { value: "200+", label: "Students Supported" },
-  { value: "50+", label: "Teams Managed" },
-  { value: "100%", label: "Automation" },
+  { value: "500+", label: "Registered Teams" },
+  { value: "2,000+", label: "Active Students" },
+  { value: "100%", label: "Automated Tracking" },
 ];
 
 export default function HomePage() {
   return (
-    <main className="overflow-x-hidden">
-      <section className="relative min-h-[100dvh] flex items-center justify-center pt-20 pb-20 md:pt-32 md:pb-32">
-        <div className="container-page">
+    <main className="overflow-x-hidden bg-[#0B132B] text-slate-100 min-h-screen">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center justify-center pt-24 pb-20 border-b border-slate-800/80">
+        <div className="container-page relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div className="max-w-3xl">
+            <div className="max-w-2xl">
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="mb-8 flex flex-wrap items-center gap-2"
+                transition={{ duration: 0.4 }}
+                className="mb-6 flex flex-wrap items-center gap-2"
               >
-                <span className="badge-primary">eYRC 2026-27 Season</span>
-                <span className="badge-secondary">Registration Open</span>
-                <span className="badge-accent">7 Themes</span>
+                <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-bold uppercase tracking-wider">
+                  eYRC 2026-27 Season
+                </span>
+                <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold uppercase tracking-wider">
+                  Phase 1 Testing Live
+                </span>
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-                className="text-display-xl font-display font-bold text-foreground leading-none tracking-tight mb-6"
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6"
               >
                 Command Center for{" "}
-                <span className="text-gradient">e-Yantra Robotics</span>{" "}
-                <br />
-                Competition Teams
+                <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-orange-400 bg-clip-text text-transparent">
+                  e-Yantra Robotics
+                </span>{" "}
+                Teams
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                className="text-body-lg text-text-secondary max-w-xl mb-8 leading-relaxed"
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="text-lg text-slate-300 max-w-xl mb-8 leading-relaxed"
               >
-                Transform fragmented WhatsApp groups and scattered spreadsheets into a structured, 
-                game-like platform that drives teams toward the National Finale at IIT Bombay.
+                Supercharge your robotics team's progression. Track 6-week roadmaps, submit simulation tasks, earn XP, and secure your place at the National Finale at IIT Bombay.
               </motion.p>
 
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex flex-wrap items-center gap-4"
               >
-                <Button size="lg" asChild>
-                  <Link href="/login">
-                    <span>Get Started Free</span>
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-                <Button variant="secondary" size="lg" asChild>
-                  <Link href="/themes">
-                    Explore Themes
-                    <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </Button>
+                <Link
+                  href="/auth/login-leader"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02]"
+                >
+                  <span>Team Captain Sign In</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 flex items-center gap-2 transition-colors"
+                >
+                  <span>Explore Dashboard</span>
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-                className="mt-12 flex flex-wrap items-center gap-8 text-sm"
+                transition={{ duration: 0.4, delay: 0.4 }}
+                className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-slate-800"
               >
-                {stats.map((stat, i) => (
-                  <div key={stat.label} className="flex items-center gap-2">
-                    <span className="text-display-sm font-display font-bold text-gradient">{stat.value}</span>
-                    <span className="text-text-secondary">{stat.label}</span>
+                {stats.map((stat) => (
+                  <div key={stat.label}>
+                    <div className="text-2xl font-extrabold text-orange-400">{stat.value}</div>
+                    <div className="text-xs text-slate-400 font-medium">{stat.label}</div>
                   </div>
                 ))}
               </motion.div>
             </div>
 
+            {/* Dashboard Showcase Card */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative aspect-square max-w-md mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 via-transparent to-brand-secondary/20 rounded-[3rem] blur-3xl" aria-hidden="true" />
-                <div className="relative rounded-[3rem] bg-surface/30 backdrop-blur-2xl border border-border/30 p-8 aspect-square flex items-center justify-center">
-                  <div className="text-center">
-                    <Bot className="h-24 w-24 mx-auto mb-6 text-brand-primary/50" aria-hidden="true" />
-                    <h3 className="text-heading-lg font-semibold text-foreground mb-2">Dashboard Preview</h3>
-                    <p className="text-text-secondary text-sm mb-6 max-w-xs mx-auto">Real-time team progress, XP, deadlines, and forum activity</p>
-                    <div className="grid grid-cols-3 gap-3 text-center">
-                      <div className="p-3 rounded-xl bg-surface-elevated/50 border border-border/30">
-                        <div className="text-2xl font-bold text-brand-primary">1,247</div>
-                        <div className="text-xs text-text-muted">Total XP</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-surface-elevated/50 border border-border/30">
-                        <div className="text-2xl font-bold text-brand-secondary">87%</div>
-                        <div className="text-xs text-text-muted">Progress</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-surface-elevated/50 border border-border/30">
-                        <div className="text-2xl font-bold text-brand-accent">12</div>
-                        <div className="text-xs text-text-muted">Days Left</div>
-                      </div>
+              <div className="bg-slate-900/80 border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+                      <Cpu className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-100 text-base">eYRC Live Status</h3>
+                      <p className="text-xs text-slate-400">Team #2409 • Stage 1 Active</p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/20">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Online
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
+                    <div className="flex justify-between items-center text-xs mb-2 font-medium">
+                      <span className="text-slate-400">Active Theme: Logic Quest (LQ)</span>
+                      <span className="text-orange-400 font-bold">45% Complete</span>
+                    </div>
+                    <div className="h-2.5 bg-slate-950 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-orange-500 rounded-full w-[45%]" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-3 bg-slate-800/40 border border-slate-700/40 rounded-xl text-center">
+                      <div className="text-lg font-bold text-blue-400">2,450</div>
+                      <div className="text-[11px] text-slate-400">Earned XP</div>
+                    </div>
+                    <div className="p-3 bg-slate-800/40 border border-slate-700/40 rounded-xl text-center">
+                      <div className="text-lg font-bold text-orange-400">#4</div>
+                      <div className="text-[11px] text-slate-400">Rank</div>
+                    </div>
+                    <div className="p-3 bg-slate-800/40 border border-slate-700/40 rounded-xl text-center">
+                      <div className="text-lg font-bold text-emerald-400">3 Days</div>
+                      <div className="text-[11px] text-slate-400">Next Task</div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 hidden lg:block">
-                <motion.div
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="card-double-bezel p-4 max-w-xs"
-                >
-                  <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-2 w-2 rounded-full bg-brand-secondary animate-pulse" aria-hidden="true" />
-                      <span className="text-xs font-medium text-brand-secondary">Live Activity</span>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-secondary">Team Alpha</span>
-                        <span className="text-brand-primary font-medium">+50 XP</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-secondary">Priya S.</span>
-                        <span className="text-brand-secondary font-medium">Best Answer</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-text-muted">Team Beta</span>
-                        <span className="text-brand-accent font-medium">Task Submitted</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="section-xl bg-surface/30 backdrop-blur-xl border-y border-border/30">
+      {/* Features Grid */}
+      <section className="py-20 bg-slate-900/40 border-b border-slate-800">
         <div className="container-page">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center max-w-3xl mx-auto mb-16"
-          >
-            <h2 className="text-display-md font-display font-bold text-foreground mb-4">Everything you need to win eYRC</h2>
-            <p className="text-body-lg text-text-secondary">A complete ecosystem designed for coordinators, team leaders, and members to collaborate, learn, and compete effectively.</p>
-          </motion.div>
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-white mb-3">Everything Teams Need to Win</h2>
+            <p className="text-slate-400 text-sm">Built specifically for the e-Yantra competition workflow from IIT Bombay.</p>
+          </div>
 
-          <div className="grid-bento-3">
-            {features.map((feature, index) => (
-              <motion.article
-                key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.1 }}
-                className="card-double-bezel group"
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+                className="bg-slate-800/40 border border-slate-700/50 hover:border-blue-500/50 p-6 rounded-2xl transition-all"
               >
-                <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6 h-full transition-all duration-500 ease-spring hover:border-brand-primary/50 hover:shadow-card-hover hover:-translate-y-1">
-                  <div className="relative h-12 w-12 rounded-xl bg-brand-primary/15 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 ease-spring">
-                    <feature.icon className="h-6 w-6 text-brand-primary" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-heading-md font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-body text-text-secondary">{feature.description}</p>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+                  <f.icon className="w-5 h-5" />
                 </div>
-              </motion.article>
+                <h3 className="font-bold text-slate-100 text-lg mb-2">{f.title}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{f.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section-xl">
+      {/* 7 Themes Showcase */}
+      <section className="py-20 border-b border-slate-800">
         <div className="container-page">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center max-w-3xl mx-auto mb-16"
-          >
-            <h2 className="text-display-md font-display font-bold text-foreground mb-4">The 7 eYRC Themes</h2>
-            <p className="text-body-lg text-text-secondary">Each theme offers unique challenges from beginner-friendly maze solving to expert-level multi-robot coordination.</p>
-          </motion.div>
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-white mb-3">The 7 eYRC Competition Themes</h2>
+            <p className="text-slate-400 text-sm">From line-following logic to multi-robot exploration.</p>
+          </div>
 
-          <div className="grid-bento-4 max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { code: "PB", name: "PacBot", tagline: "Maze-solving with game theory", difficulty: "BEGINNER", color: "#06B6D4" },
-              { code: "NV", name: "Niti Vahan", tagline: "Autonomous vehicle navigation", difficulty: "INTERMEDIATE", color: "#8B5CF6" },
-              { code: "LQ", name: "Logic Quest", tagline: "RFID decryption & path planning", difficulty: "INTERMEDIATE", color: "#6366F1" },
-              { code: "EB", name: "Echo Balancer", tagline: "Self-balancing two-wheel robot", difficulty: "INTERMEDIATE", color: "#EC4899" },
-              { code: "KD", name: "Khoj-o-Drone", tagline: "Autonomous survivor search drone", difficulty: "ADVANCED", color: "#10B981" },
-              { code: "SC", name: "Strata Cobot", tagline: "Mobile base + robotic arm", difficulty: "ADVANCED", color: "#F59E0B" },
-              { code: "HE", name: "Hola The Explorer", tagline: "3-robot coordinated exploration", difficulty: "EXPERT", color: "#EF4444" },
-            ].map((theme, index) => (
-              <motion.article
+              { code: "PB", name: "PacBot", tagline: "Maze-solving with game theory", difficulty: "BEGINNER" },
+              { code: "NV", name: "Niti Vahan", tagline: "Autonomous vehicle navigation", difficulty: "INTERMEDIATE" },
+              { code: "LQ", name: "Logic Quest", tagline: "RFID decryption & path planning", difficulty: "INTERMEDIATE" },
+              { code: "EB", name: "Echo Balancer", tagline: "Self-balancing two-wheel robot", difficulty: "INTERMEDIATE" },
+              { code: "KD", name: "Khoj-o-Drone", tagline: "Autonomous search drone", difficulty: "ADVANCED" },
+              { code: "SC", name: "Strata Cobot", tagline: "Mobile base + robotic arm", difficulty: "ADVANCED" },
+              { code: "HE", name: "Hola The Explorer", tagline: "Multi-robot swarm exploration", difficulty: "EXPERT" },
+            ].map((theme) => (
+              <div
                 key={theme.code}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.05 }}
-                className="card-double-bezel group relative overflow-hidden"
+                className="bg-slate-800/30 border border-slate-700/50 hover:border-orange-500/50 p-5 rounded-2xl transition-all"
               >
-                <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5 h-full transition-all duration-500 ease-spring hover:border-brand-primary/50 hover:shadow-card-hover hover:-translate-y-1 relative">
-                  <div className="absolute top-4 right-4 h-3 w-3 rounded-full" style={{ backgroundColor: theme.color }} aria-hidden="true" />
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${theme.color}20` }}>
-                      <span className="text-xl font-bold" style={{ color: theme.color }}>{theme.code}</span>
-                    </div>
-                    <div>
-                      <h3 className="text-heading-sm font-bold text-foreground">{theme.name}</h3>
-                      <p className="text-caption text-text-muted uppercase tracking-wide">{theme.difficulty}</p>
-                    </div>
-                  </div>
-                  <p className="text-body-sm text-text-secondary mb-4">{theme.tagline}</p>
-                  <Button variant="outline" size="sm" className="w-full" asChild>
-                    <Link href={`/themes/${theme.code}`}>
-                      Explore Theme
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Link>
-                  </Button>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="px-2.5 py-1 bg-blue-600/20 text-blue-400 font-extrabold rounded text-xs border border-blue-500/30">
+                    {theme.code}
+                  </span>
+                  <span className="text-[10px] font-bold text-orange-400 px-2 py-0.5 bg-orange-500/10 rounded border border-orange-500/20">
+                    {theme.difficulty}
+                  </span>
                 </div>
-              </motion.article>
+                <h4 className="font-bold text-slate-100 mb-1">{theme.name}</h4>
+                <p className="text-xs text-slate-400">{theme.tagline}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
-
-      <section className="section-xl bg-surface/30 backdrop-blur-xl border-y border-border/30">
-        <div className="container-page max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-display-md font-display font-bold text-foreground mb-4">Ready to lead your team to victory?</h2>
-            <p className="text-body-lg text-text-secondary mb-8">Join hundreds of students already using the platform. Free for college teams. Setup in minutes.</p>
-          </motion.div>
-
-          <div className="card-double-bezel">
-            <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-8 md:p-12 text-center">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button size="lg" asChild className="w-full sm:w-auto">
-                  <Link href="/login">
-                    <span>Start Free - No Credit Card</span>
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-                <Button variant="secondary" size="lg" asChild className="w-full sm:w-auto">
-                  <Link href="/themes">
-                    Browse All Themes
-                  </Link>
-                </Button>
-              </div>
-              <p className="mt-6 text-sm text-text-muted">By continuing, you agree to our Terms of Service and Privacy Policy</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-border/30 py-12 md:py-16">
-        <div className="container-page">
-          <div className="grid md:grid-cols-4 gap-8 md:gap-12">
-            <div className="md:col-span-2">
-              <Link href="/" className="flex items-center gap-2 mb-4" aria-label="eYRC Command Center Home">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center">
-                  <Bot className="h-5 w-5 text-white" aria-hidden="true" />
-                </div>
-                <span className="font-display font-bold text-xl text-foreground">eYRC</span>
-              </Link>
-              <p className="text-body text-text-secondary max-w-sm mb-6">
-                The ultimate command center for e-Yantra Robotics Competition teams. 
-                Manage, mentor, and gamify the journey to the National Finale at IIT Bombay.
-              </p>
-              <div className="flex gap-6 text-sm text-text-muted">
-                <span>© 2026 eYRC Command Center</span>
-                <span>Not affiliated with IIT Bombay</span>
-              </div>
-            </div>
-
-            <nav>
-              <h4 className="font-semibold text-foreground mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm text-text-secondary">
-                <li><Link href="/themes" className="hover:text-brand-primary transition-colors">Themes</Link></li>
-                <li><Link href="/forum" className="hover:text-brand-primary transition-colors">Forum</Link></li>
-                <li><Link href="/leaderboard" className="hover:text-brand-primary transition-colors">Leaderboard</Link></li>
-                <li><Link href="/resources" className="hover:text-brand-primary transition-colors">Resources</Link></li>
-              </ul>
-            </nav>
-
-            <nav>
-              <h4 className="font-semibold text-foreground mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-text-secondary">
-                <li><Link href="/docs" className="hover:text-brand-primary transition-colors">Documentation</Link></li>
-                <li><Link href="/faq" className="hover:text-brand-primary transition-colors">FAQ</Link></li>
-                <li><Link href="/contact" className="hover:text-brand-primary transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="hover:text-brand-primary transition-colors">Privacy Policy</Link></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
