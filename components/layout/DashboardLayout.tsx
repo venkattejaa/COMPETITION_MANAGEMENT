@@ -5,14 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, Bot, BookOpen, Trophy, LogOut, User, Settings, Bell, ChevronLeft, Menu, X, Bot as BotIcon, BarChart2, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, Bot, BookOpen, Trophy, LogOut, User, Settings, Bell, ChevronLeft, Menu, X, Bot as BotIcon, BarChart2, Megaphone, MessageSquare } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/teams", label: "My Team", icon: Users },
   { href: "/themes", label: "Themes", icon: Bot },
-  { href: "/forum", label: "Forum", icon: BookOpen },
+  { href: "/resources", label: "Resources", icon: BookOpen },
+  { href: "/forum", label: "Forum", icon: MessageSquare },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
