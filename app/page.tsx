@@ -96,7 +96,7 @@ export default function HomePage() {
                 className="flex flex-wrap items-center gap-4"
               >
                 <Link
-                  href="/auth/login-leader"
+                  href="/login"
                   className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all hover:scale-[1.02]"
                 >
                   <span>Team Captain Sign In</span>
