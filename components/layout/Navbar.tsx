@@ -6,20 +6,22 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Menu, X, Users, Trophy, BookOpen, LayoutDashboard, LogOut, User, Settings, Bell, ChevronDown, Bot } from "lucide-react";
+import { Menu, X, Users, Trophy, BookOpen, LayoutDashboard, LogOut, User, Settings, Bell, ChevronDown, Bot, MessageSquare } from "lucide-react";
+import { EYantraLogo } from "@/components/ui/EYantraLogo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/teams", label: "Teams", icon: Users },
   { href: "/themes", label: "Themes", icon: Bot },
-  { href: "/forum", label: "Forum", icon: BookOpen },
+  { href: "/resources", label: "Resources", icon: BookOpen },
+  { href: "/forum", label: "Forum", icon: MessageSquare },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 const adminNavItems = [
   { href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
   { href: "/admin/announcements", label: "Announcements", icon: Bell },
-  { href: "/admin/analytics", label: "Analytics", icon: BookOpen },
 ];
 
 export function Navbar({ user, isAdmin }: { user: any; isAdmin: boolean }) {
@@ -39,19 +41,14 @@ export function Navbar({ user, isAdmin }: { user: any; isAdmin: boolean }) {
   }, [pathname]);
 
   return (
-    <header className={cn("fixed top-6 left-1/2 -translate-x-1/2 z-layer-sticky w-full max-w-[1400px] px-4 transition-all duration-500 ease-spring", isScrolled ? "top-4" : "top-6")}>
+    <header className={cn("fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 transition-all duration-300")}>
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative flex h-16 items-center justify-between gap-4 rounded-full bg-surface/50 backdrop-blur-2xl border border-border/30 px-4 md:px-6"
-        style={{ boxShadow: "0 4px 24px 0 rgb(0 0 0 / 0.2), 0 1px 2px 0 rgb(0 0 0 / 0.1)" }}
+        className="relative flex h-16 items-center justify-between gap-4 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-slate-800 px-4 md:px-6 shadow-xl"
       >
-        <Link href="/dashboard" className="flex items-center gap-2" aria-label="eYRC Command Center">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary">
-            <Bot className="h-5 w-5 text-white" aria-hidden="true" />
-          </div>
-          <span className="hidden font-display font-bold text-xl text-foreground sm:block">eYRC</span>
+        <Link href="/dashboard" aria-label="eYRC Command Center">
+          <EYantraLogo size="sm" />
         </Link>
 
         <div className="hidden md:flex md:items-center md:gap-1">
@@ -60,90 +57,58 @@ export function Navbar({ user, isAdmin }: { user: any; isAdmin: boolean }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ease-spring",
+                "relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all duration-200",
                 pathname === item.href
-                  ? "bg-brand-primary text-white shadow-brand"
-                  : "text-text-secondary hover:text-foreground hover:bg-surface-elevated/50"
+                  ? "bg-orange-500 text-white shadow-md shadow-orange-500/25"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               )}
             >
-              <item.icon className="h-4 w-4" aria-hidden="true" />
+              <item.icon className="h-4 w-4" />
               <span>{item.label}</span>
             </Link>
           ))}
         </div>
 
         <div className="flex items-center gap-2">
-          {isAdmin && (
-            <div className="hidden md:flex md:items-center md:gap-1 border-l border-border/30 pl-2 ml-2">
-              {adminNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ease-spring",
-                    pathname === item.href
-                      ? "bg-brand-accent/20 text-brand-accent border border-brand-accent/30"
-                      : "text-text-secondary hover:text-foreground hover:bg-surface-elevated/50"
-                  )}
-                >
-                  <item.icon className="h-4 w-4" aria-hidden="true" />
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <ThemeToggle />
 
           <div className="relative">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-text-secondary transition-all duration-300 ease-spring hover:text-foreground hover:bg-surface-elevated/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              aria-expanded={isProfileOpen}
-              aria-haspopup="true"
+              className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="relative h-8 w-8 rounded-full bg-brand-primary/20 flex items-center justify-center overflow-hidden">
+              <div className="relative h-7 w-7 rounded-full bg-orange-500/20 flex items-center justify-center overflow-hidden">
                 {user?.avatar ? (
                   <img src={user.avatar} alt="" className="h-full w-full object-cover" />
                 ) : (
-                  <span className="text-brand-primary font-semibold">{user?.name?.charAt(0).toUpperCase()}</span>
+                  <span className="text-orange-600 dark:text-orange-400 font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
                 )}
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-brand-secondary border-2 border-surface" aria-hidden="true" />
               </div>
-              <span className="hidden sm:block max-w-[120px] truncate">{user?.name}</span>
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isProfileOpen && "rotate-180")} aria-hidden="true" />
+              <span className="hidden sm:block max-w-[100px] truncate">{user?.name}</span>
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", isProfileOpen && "rotate-180")} />
             </button>
 
             <AnimatePresence>
               {isProfileOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-surface/90 backdrop-blur-2xl border border-border/50 shadow-card-hover p-2"
-                  style={{ boxShadow: "0 20px 40px -12px rgb(0 0 0 / 0.4)" }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50"
                 >
-                  <div className="px-3 py-2 border-b border-border/30">
-                    <p className="text-sm font-medium text-foreground">{user?.name}</p>
-                    <p className="text-xs text-text-muted truncate">{user?.email}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="badge-primary">{user?.role}</span>
-                      {user?.level && <span className="badge-accent">Level {user.level}</span>}
-                    </div>
+                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user?.name}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
                   </div>
-                  <Link href="/profile" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-text-secondary hover:text-foreground hover:bg-surface-elevated/50 transition-colors">
-                    <User className="h-4 w-4" aria-hidden="true" />
+                  <Link href="/profile" className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <User className="h-4 w-4 text-orange-500" />
                     Profile
                   </Link>
-                  <Link href="/settings" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-text-secondary hover:text-foreground hover:bg-surface-elevated/50 transition-colors">
-                    <Settings className="h-4 w-4" aria-hidden="true" />
-                    Settings
-                  </Link>
-                  <div className="divider my-2" />
                   <button
                     onClick={() => signOut({ callbackUrl: "/login" })}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-danger hover:bg-brand-danger/10 transition-colors"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10"
                   >
-                    <LogOut className="h-4 w-4" aria-hidden="true" />
+                    <LogOut className="h-4 w-4" />
                     Sign Out
                   </button>
                 </motion.div>
@@ -153,65 +118,38 @@ export function Navbar({ user, isAdmin }: { user: any; isAdmin: boolean }) {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition-colors hover:text-foreground hover:bg-surface-elevated/50"
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isMobileMenuOpen}
+            className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </motion.nav>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute left-4 right-4 top-full mt-4 rounded-2xl bg-surface/90 backdrop-blur-2xl border border-border/50 py-4 md:hidden"
-            style={{ boxShadow: "0 20px 40px -12px rgb(0 0 0 / 0.4)" }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mt-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-2xl md:hidden space-y-1"
           >
-            <div className="flex flex-col gap-1 px-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                    pathname === item.href
-                      ? "bg-brand-primary/20 text-brand-primary"
-                      : "text-text-secondary hover:text-foreground hover:bg-surface-elevated/50"
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <item.icon className="h-5 w-5" aria-hidden="true" />
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-              {isAdmin && (
-                <>
-                  <div className="divider my-2" />
-                  <p className="px-3 py-1 text-xs font-medium uppercase tracking-[0.15em] text-text-muted">Admin</p>
-                  {adminNavItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                        pathname === item.href
-                          ? "bg-brand-accent/20 text-brand-accent"
-                          : "text-text-secondary hover:text-foreground hover:bg-surface-elevated/50"
-                      )}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      <span>{item.label}</span>
-                    </Link>
-                  ))}
-                </>
-              )}
-            </div>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-bold transition-colors",
+                  pathname === item.href
+                    ? "bg-orange-500 text-white"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
