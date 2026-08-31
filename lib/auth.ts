@@ -28,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email) return null;
         
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
+          where: { email: (credentials.email as string).toLowerCase() }
         });
         
         if (user) {
@@ -38,7 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Auto-create user for development/demo if they don't exist
         const newUser = await prisma.user.create({
           data: {
-            email: credentials.email as string,
+            email: (credentials.email as string).toLowerCase(),
             name: (credentials.email as string).split('@')[0],
             role: "TEAM_LEADER",
           }
@@ -49,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! },
@@ -68,31 +68,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async session({ session, token }) {
-      if (token && session.user) {
-        // Fetch fresh user data from DB using token ID to ensure session is up to date
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          include: { team: true },
-        });
-
-        if (dbUser) {
-          session.user.id = dbUser.id;
-          session.user.role = dbUser.role;
-          session.user.teamId = dbUser.teamId;
-          session.user.isTeamLeader = dbUser.isTeamLeader;
-          session.user.xp = dbUser.xp;
-          session.user.level = dbUser.level;
-        }
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
+        token.teamId = (user as any).teamId;
+        token.isTeamLeader = (user as any).isTeamLeader;
+        token.xp = (user as any).xp;
+        token.level = (user as any).level;
       }
+      
+      if (trigger === "update" && session) {
+        return { ...token, ...session };
+      }
+      
       return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as any;
+        session.user.teamId = token.teamId as string | null;
+        session.user.isTeamLeader = token.isTeamLeader as boolean;
+        session.user.xp = (token.xp as number) || 0;
+        session.user.level = (token.level as number) || 1;
+      }
+      return session;
     },
   },
   pages: {
@@ -129,10 +130,5 @@ declare module "next-auth" {
     isTeamLeader?: boolean;
     xp?: number;
     level?: number;
-  }
-  
-  interface JWT {
-    id: string;
-    role: "COORDINATOR" | "TEAM_LEADER" | "MEMBER";
   }
 }
