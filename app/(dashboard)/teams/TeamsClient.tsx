@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { cn, generateTeamCode, formatRelativeTime } from "@/lib/utils";
-import { Users, Plus, Search, ChevronDown, Mail, Lock, Loader2, CheckCircle, XCircle, AlertCircle, Copy, ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Badge, Tag } from "@/components/ui/Badge";
+import { cn, generateTeamCode } from "@/lib/utils";
+import { Users, Plus, Search, Mail, Loader2, CheckCircle, XCircle, AlertCircle, Copy, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Avatar, AvatarGroup } from "@/components/ui/Avatar";
 
 interface Team {
@@ -95,26 +92,38 @@ export function TeamsClient({ teams, userTeam, currentUserId }: TeamsClientProps
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto pb-8">
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.4 }}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground">Teams</h1>
-          <p className="text-body text-text-secondary mt-1">Manage teams, view progress, and collaborate</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Teams Directory
+          </h1>
+          <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mt-1">
+            Discover eYRC teams, inspect members, and check progress
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {!userTeam && (
             <>
-              <Button variant="outline" onClick={() => setShowJoinModal(true)}>
-                <Mail className="h-4 w-4" aria-hidden="true" />
+              <Button
+                variant="secondary"
+                onClick={() => setShowJoinModal(true)}
+                className="rounded-2xl border border-slate-200 dark:border-zinc-800 text-xs font-bold"
+              >
+                <Mail className="h-4 w-4" />
                 Join Team
               </Button>
-              <Button onClick={() => setShowCreateModal(true)}>
-                <Plus className="h-4 w-4" aria-hidden="true" />
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold"
+              >
+                <Plus className="h-4 w-4" />
                 Create Team
               </Button>
             </>
@@ -122,44 +131,48 @@ export function TeamsClient({ teams, userTeam, currentUserId }: TeamsClientProps
         </div>
       </motion.div>
 
+      {/* User's Team Spotlight Card */}
       {userTeam && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          className="card-double-bezel"
+          transition={{ duration: 0.4, delay: 0.05 }}
         >
           <Link href={`/teams/${userTeam.id}`} className="block">
-            <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5 hover:border-brand-primary/50 hover:shadow-card-hover transition-all duration-300 ease-spring">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-xl bg-brand-primary/15 flex items-center justify-center">
-                  <Users className="h-7 w-7 text-brand-primary" aria-hidden="true" />
+            <div className="rounded-3xl bg-white dark:bg-[#121215] border-2 border-[#F05438]/40 dark:border-[#F05438]/50 p-6 shadow-lg shadow-[#F05438]/5 hover:border-[#F05438] transition-all">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-[#F05438]/10 text-[#F05438] flex items-center justify-center flex-shrink-0">
+                  <Users className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-heading-md font-bold text-foreground">{userTeam.name}</h3>
-                    <Badge variant="outline">{userTeam.code}</Badge>
-                    {userTeam.assignedTheme && <Badge variant="primary">{userTeam.assignedTheme}</Badge>}
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">{userTeam.name}</h3>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-mono">
+                      {userTeam.code}
+                    </span>
+                    {userTeam.assignedTheme && (
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#F05438]/10 text-[#F05438]">
+                        {userTeam.assignedTheme}
+                      </span>
+                    )}
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      Your Team
+                    </span>
                   </div>
-                  <p className="text-sm text-text-secondary mb-2">{userTeam.description || "No description"}</p>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted">
-                    <span className="flex items-center gap-1">
-                      <Users className="h-3.5 w-3.5" aria-hidden="true" />
-                      {userTeam.members.length}/4 members
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <CheckCircle className="h-3.5 w-3.5 text-brand-secondary" aria-hidden="true" />
-                      {userTeam.progressPercent}% progress
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <AlertCircle className="h-3.5 w-3.5 text-brand-accent" aria-hidden="true" />
-                      Stage: {userTeam.currentStage.replace("_", " ")}
-                    </span>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-1 mb-2">
+                    {userTeam.description || "No description provided"}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-zinc-400">
+                    <span>{userTeam.members.length}/4 Members</span>
+                    <span>•</span>
+                    <span>{userTeam.progressPercent}% Progress</span>
+                    <span>•</span>
+                    <span>{userTeam.currentStage.replace("_", " ")}</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-brand-accent">{userTeam.totalXp} XP</div>
-                  <div className="text-xs text-text-muted">Total Team XP</div>
+                <div className="text-left sm:text-right flex-shrink-0">
+                  <p className="text-xl font-black text-[#F05438]">{userTeam.totalXp} XP</p>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase">Total XP</p>
                 </div>
               </div>
             </div>
@@ -167,161 +180,167 @@ export function TeamsClient({ teams, userTeam, currentUserId }: TeamsClientProps
         </motion.div>
       )}
 
+      {/* Search Input Bar */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        className="card-double-bezel"
+        transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5">
-          <div className="flex items-center gap-4 mb-4">
-            <Search className="h-5 w-5 text-text-muted flex-shrink-0" aria-hidden="true" />
-            <input
-              type="text"
-              placeholder="Search teams, members, codes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none focus-visible:outline-none text-foreground placeholder:text-text-muted"
-            />
-          </div>
-
-          <div className={filteredTeams.length === 0 ? "hidden" : ""}>
-            <div className="space-y-3">
-              {filteredTeams.map((team, index) => (
-                <motion.article
-                  key={team.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.03 }}
-                  className="card-double-bezel group"
-                >
-                  <Link href={`/teams/${team.id}`} className="block">
-                    <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-4 transition-all duration-300 ease-spring hover:border-brand-primary/50 hover:shadow-card-hover">
-                      <div className="flex items-center gap-4">
-                        <div className="flex-shrink-0 w-12 text-center">
-                          <div className="h-10 w-10 rounded-xl bg-brand-primary/15 flex items-center justify-center mx-auto mb-1">
-                            <Users className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                          </div>
-                          <span className="text-xs font-mono text-text-muted">{team.code}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-foreground truncate">{team.name}</h3>
-                            {team.assignedTheme && <Badge variant="primary" className="text-xs">{team.assignedTheme}</Badge>}
-                          </div>
-                          <p className="text-sm text-text-secondary line-clamp-1 mb-2">{team.description || "No description"}</p>
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
-                            <span className="flex items-center gap-1">
-                              <Users className="h-3 w-3" aria-hidden="true" />
-                              {team.members.length}/4
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3" aria-hidden="true" />
-                              {team.progressPercent}%
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <AlertCircle className="h-3 w-3" aria-hidden="true" />
-                              {team.currentStage.replace("_", " ")}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <AvatarGroup max={3}>
-                            {team.members.map((m) => (
-                              <Avatar key={m.id} src={m.avatar} name={m.name} size="sm" />
-                            ))}
-                          </AvatarGroup>
-                          <div className="text-right hidden sm:block">
-                            <p className="font-bold text-brand-accent">{team.totalXp} XP</p>
-                            <p className="text-xs text-text-muted">Total XP</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.article>
-              ))}
-            </div>
-          </div>
-
-          {filteredTeams.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto text-text-muted mb-4" aria-hidden="true" />
-              <h3 className="text-heading-sm font-semibold text-foreground mb-2">
-                {searchQuery ? "No teams found" : "No teams yet"}
-              </h3>
-              <p className="text-text-secondary mb-4">
-                {searchQuery ? "Try adjusting your search" : "Be the first to create a team!"}
-              </p>
-              {!searchQuery && (
-                <div className="flex justify-center gap-3">
-                  <Button variant="outline" onClick={() => setShowJoinModal(true)}>
-                    <Mail className="h-4 w-4" aria-hidden="true" />
-                    Join Team
-                  </Button>
-                  <Button onClick={() => setShowCreateModal(true)}>
-                    <Plus className="h-4 w-4" aria-hidden="true" />
-                    Create Team
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+        <div className="relative">
+          <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400 dark:text-zinc-500" />
+          <input
+            type="text"
+            placeholder="Search teams by name, code, or member..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80 pl-11 pr-4 py-3 text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#F05438] transition-colors"
+          />
         </div>
       </motion.div>
 
+      {/* Teams Grid */}
+      <div className="space-y-3">
+        {filteredTeams.map((team, index) => (
+          <motion.div
+            key={team.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.03 }}
+          >
+            <Link href={`/teams/${team.id}`} className="block">
+              <div className="rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80 p-5 hover:border-[#F05438] transition-all group">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="h-10 w-10 rounded-2xl bg-slate-100 dark:bg-zinc-800/60 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-zinc-300 font-bold group-hover:bg-[#F05438]/10 group-hover:text-[#F05438] transition-colors">
+                      <Users className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="font-extrabold text-slate-900 dark:text-white text-sm truncate">
+                          {team.name}
+                        </h3>
+                        {team.assignedTheme && (
+                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-mono">
+                            {team.assignedTheme}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-1">
+                        {team.description || "No description"}
+                      </p>
+                      <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-400 dark:text-zinc-500 mt-1">
+                        <span className="font-mono">{team.code}</span>
+                        <span>•</span>
+                        <span>{team.members.length}/4 Members</span>
+                        <span>•</span>
+                        <span>{team.progressPercent}% Progress</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-zinc-800">
+                    <AvatarGroup max={4}>
+                      {team.members.map((m) => (
+                        <Avatar key={m.id} src={m.avatar} name={m.name} size="sm" />
+                      ))}
+                    </AvatarGroup>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-black text-[#F05438]">{team.totalXp} XP</p>
+                      <p className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase">Total XP</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+
+      {filteredTeams.length === 0 && (
+        <div className="text-center py-12 rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80">
+          <Users className="h-12 w-12 mx-auto text-slate-400 dark:text-zinc-600 mb-3" />
+          <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">
+            {searchQuery ? "No matching teams found" : "No teams created yet"}
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mb-4">
+            {searchQuery ? "Try searching with a different name or team code" : "Be the first to form a team for eYRC 2026-27"}
+          </p>
+          {!searchQuery && (
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setShowJoinModal(true)}
+                className="rounded-2xl text-xs font-bold"
+              >
+                Join Team
+              </Button>
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold"
+              >
+                Create Team
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Create Team Modal */}
       <AnimatePresence>
         {showCreateModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowCreateModal(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-md rounded-2xl bg-surface backdrop-blur-2xl border border-border/50 p-6"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md rounded-3xl bg-white dark:bg-[#121215] border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl space-y-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-heading-lg font-semibold text-foreground">Create New Team</h2>
-                <button onClick={() => setShowCreateModal(false)} className="btn-icon text-text-secondary hover:text-foreground">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">Create New Team</h2>
+                <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                   <XCircle className="h-5 w-5" />
                 </button>
               </div>
+
               <form onSubmit={handleCreateTeam} className="space-y-4">
-                <Input label="Team Name" name="name" placeholder="e.g., Team Alpha" required autoComplete="off" />
-                <Input label="Description (optional)" name="description" placeholder="Brief description of your team" />
-                <div className="p-4 rounded-xl bg-surface-elevated/50 border border-border/30">
-                  <p className="text-sm font-medium text-foreground mb-2">Your team code will be:</p>
-                  <div className="flex items-center justify-between">
-                    <code className="text-lg font-mono font-bold text-brand-primary">{generateTeamCode("CSE")}</code>
-                    <Button variant="ghost" size="icon" onClick={() => navigator.clipboard.writeText(generateTeamCode("CSE"))}>
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-text-muted mt-2">Share this code with teammates to join</p>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Team Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="e.g. Robo Warriors"
+                    required
+                    className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                  />
                 </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Description (Optional)</label>
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="Brief description of your robotics team"
+                    className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                  />
+                </div>
+
                 {createError && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-brand-danger/10 border border-brand-danger/30 text-brand-danger text-sm">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                    {createError}
-                  </div>
+                  <p className="text-xs font-bold text-red-500">{createError}</p>
                 )}
-                <div className="flex justify-end gap-3 pt-2">
-                  <Button variant="secondary" type="button" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-                  <Button type="submit" disabled={isCreating}>
-                    {isCreating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                        Creating...
-                      </>
-                    ) : (
-                      "Create Team"
-                    )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="secondary" onClick={() => setShowCreateModal(false)} className="rounded-2xl text-xs font-bold">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isCreating} className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold">
+                    {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Team"}
                   </Button>
                 </div>
               </form>
@@ -330,39 +349,54 @@ export function TeamsClient({ teams, userTeam, currentUserId }: TeamsClientProps
         )}
       </AnimatePresence>
 
+      {/* Join Team Modal */}
       <AnimatePresence>
         {showJoinModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowJoinModal(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-md rounded-2xl bg-surface backdrop-blur-2xl border border-border/50 p-6"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md rounded-3xl bg-white dark:bg-[#121215] border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl space-y-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-heading-lg font-semibold text-foreground">Join a Team</h2>
-                <button onClick={() => setShowJoinModal(false)} className="btn-icon text-text-secondary hover:text-foreground">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">Join a Team</h2>
+                <button onClick={() => setShowJoinModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                   <XCircle className="h-5 w-5" />
                 </button>
               </div>
+
               <form onSubmit={handleJoinTeam} className="space-y-4">
-                <Input label="Team Code" name="code" placeholder="EYRC-CSE-123" required autoComplete="off" helperText="Enter the team code shared by your team leader" />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Team Code</label>
+                  <input
+                    type="text"
+                    name="code"
+                    placeholder="e.g. EYRC-CSE-001"
+                    required
+                    className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Ask your team leader for your unique 12-character team code</p>
+                </div>
+
                 {joinError && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-brand-danger/10 border border-brand-danger/30 text-brand-danger text-sm">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                    {joinError}
-                  </div>
+                  <p className="text-xs font-bold text-red-500">{joinError}</p>
                 )}
-                <div className="flex justify-end gap-3 pt-2">
-                  <Button variant="secondary" type="button" onClick={() => setShowJoinModal(false)}>Cancel</Button>
-                  <Button type="submit">Join Team</Button>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="secondary" onClick={() => setShowJoinModal(false)} className="rounded-2xl text-xs font-bold">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold">
+                    Join Team
+                  </Button>
                 </div>
               </form>
             </motion.div>
