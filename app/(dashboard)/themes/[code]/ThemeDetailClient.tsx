@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn, getThemeColor, getDifficultyColor } from "@/lib/utils";
-import { ArrowLeft, Target, BookOpen, Zap, Clock, Users, ExternalLink, CheckCircle, ChevronRight, Download, Play, FileCode, BookMarked } from "lucide-react";
+import { ArrowLeft, Target, BookOpen, Zap, Clock, Users, ExternalLink, CheckCircle, ChevronRight, Download, Play, FileCode, BookMarked, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge, Tag } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -348,6 +348,3 @@ export function ThemeDetailClient({ theme }: ThemeDetailClientProps) {
     </div>
   );
 }
-
-// Need to import MessageSquare
-import { MessageSquare } from "lucide-react";
