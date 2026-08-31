@@ -7,7 +7,6 @@
   /* Official e-Yantra Coral Orange & Deep Black Theme */
   --color-eyantra-coral: #F05438;
   --color-eyantra-orange: #FF5C38;
-  --color-eyantra-cream: #F5EFE6;
   --color-eyantra-black: #000000;
   --color-eyantra-dark-card: #121215;
 
@@ -16,36 +15,39 @@
   --radius-3xl: 1.5rem;
 }
 
-/* Default Dark Mode: Ultra-Aesthetic Deep Black */
+/* Default Light Mode: Clean Bright White & eYantra Coral */
 :root {
-  --background: #000000;
-  --foreground: #F8FAFC;
-  --surface: #121215;
-  --surface-elevated: #1A1A1E;
-  --border: #222226;
-  --border-hover: #33333A;
-  --text-primary: #F8FAFC;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
-  --brand-primary: #F05438;
-  --brand-accent: #FF5C38;
-}
-
-/* Light Mode: Official e-Yantra Warm Cream & Coral */
-.light, html:not(.dark) {
-  --background: #F5EFE6;
-  --foreground: #2C2825;
+  --background: #FAFAFA;
+  --foreground: #0F172A;
   --surface: #FFFFFF;
-  --surface-elevated: #F0ECE4;
-  --border: #E8E2D8;
-  --border-hover: #DBD4C8;
-  --text-primary: #2C2825;
-  --text-secondary: #6E6862;
-  --text-muted: #9E988E;
+  --surface-elevated: #F1F5F9;
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
   --brand-primary: #F05438;
   --brand-accent: #FF5C38;
+  color-scheme: light;
 }
 
+/* Light mode class */
+.light {
+  --background: #FAFAFA;
+  --foreground: #0F172A;
+  --surface: #FFFFFF;
+  --surface-elevated: #F1F5F9;
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --brand-primary: #F05438;
+  --brand-accent: #FF5C38;
+  color-scheme: light;
+}
+
+/* Dark Mode: Pitch Black Aesthetic */
 .dark {
   --background: #000000;
   --foreground: #F8FAFC;
@@ -58,6 +60,7 @@
   --text-muted: #71717A;
   --brand-primary: #F05438;
   --brand-accent: #FF5C38;
+  color-scheme: dark;
 }
 
 * {
@@ -78,7 +81,7 @@ body {
 
 /* Light mode background styling */
 html:not(.dark) body, .light body {
-  background-color: #F5EFE6;
+  background-color: #FAFAFA;
 }
 
 /* Dark mode pure black aesthetic */
