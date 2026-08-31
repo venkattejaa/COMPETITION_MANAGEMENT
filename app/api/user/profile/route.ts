@@ -10,19 +10,32 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { name, year, branch, githubUrl, linkedinUrl, skills } = body;
+    const { name, year, branch, githubUrl, linkedinUrl, skills, avatar } = body;
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        name: name?.trim(),
-        year: year ? parseInt(year) : null,
-        branch: branch?.trim() || null,
-        githubUrl: githubUrl?.trim() || null,
-        linkedinUrl: linkedinUrl?.trim() || null,
-        skills: Array.isArray(skills) ? skills : (skills ? skills.split(",").map((s: string) => s.trim()).filter(Boolean) : []),
+        ...(name !== undefined && { name: name.trim() }),
+        ...(year !== undefined && { year: year ? parseInt(year) : null }),
+        ...(branch !== undefined && { branch: branch?.trim() || null }),
+        ...(githubUrl !== undefined && { githubUrl: githubUrl?.trim() || null }),
+        ...(linkedinUrl !== undefined && { linkedinUrl: linkedinUrl?.trim() || null }),
+        ...(avatar !== undefined && { avatar: avatar?.trim() || null }),
+        ...(skills !== undefined && {
+          skills: Array.isArray(skills) ? skills : (skills ? skills.split(",").map((s: string) => s.trim()).filter(Boolean) : []),
+        }),
       },
-      select: { id: true, name: true, email: true, year: true, branch: true, githubUrl: true, linkedinUrl: true, skills: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        year: true,
+        branch: true,
+        githubUrl: true,
+        linkedinUrl: true,
+        skills: true,
+      },
     });
 
     return NextResponse.json({ user });

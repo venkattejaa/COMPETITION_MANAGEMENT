@@ -4,14 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, formatRelativeTime, formatNumber, getXpForNextLevel } from "@/lib/utils";
-import { User, Settings, Trophy, Flame, Zap, Award, Calendar, CheckCircle, Loader2, X, Edit2, Camera, Github, Linkedin, Mail, MapPin, BookOpen, MessageSquare, Code, Star, Users, ExternalLink, AlertCircle } from "lucide-react";
+import {
+  User, Settings, Trophy, Flame, Zap, Award, Calendar, CheckCircle, Loader2, X,
+  Edit2, Camera, Github, Linkedin, Mail, MapPin, BookOpen, MessageSquare, Code,
+  Star, Users, ExternalLink, AlertCircle, Upload, Image as ImageIcon
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
 
-interface User {
+interface UserProfile {
   id: string;
   name: string;
   email: string;
@@ -41,31 +45,29 @@ interface User {
 }
 
 interface ProfileClientProps {
-  user: User;
+  user: UserProfile;
   isOwnProfile: boolean;
 }
 
-const achievementIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  zap: Zap,
-  trophy: Trophy,
-  flame: Flame,
-  "graduation-cap": User,
-  flag: BookOpen,
-  moon: Award,
-  users: MessageSquare,
-  "book-open": BookOpen,
-  code: Code,
-  calendar: Calendar,
-  "message-square": MessageSquare,
-  sunrise: Award,
-  star: Star,
-};
+const PRESET_AVATARS = [
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80",
+];
 
 export function ProfileClient({ user, isOwnProfile }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "achievements" | "activity" | "settings">("overview");
   const [isEditing, setIsEditing] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState(user.avatar || "");
+  const [isUploading, setIsUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: user.name,
+    avatar: user.avatar || "",
     year: user.year?.toString() || "",
     branch: user.branch || "",
     githubUrl: user.githubUrl || "",
@@ -73,7 +75,43 @@ export function ProfileClient({ user, isOwnProfile }: ProfileClientProps) {
     skills: user.skills.join(", "),
   });
 
-  const { current: currentThreshold, next: nextThreshold, progress } = getXpForNextLevel(user.xp);
+  const { progress } = getXpForNextLevel(user.xp);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image size should be less than 2MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setCustomAvatarUrl(base64String);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveAvatar = async (selectedAvatar: string) => {
+    setIsUploading(true);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: selectedAvatar }),
+      });
+      if (res.ok) {
+        setShowAvatarModal(false);
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Failed to update avatar", err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +121,7 @@ export function ProfileClient({ user, isOwnProfile }: ProfileClientProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
+          avatar: formData.avatar || null,
           year: formData.year ? parseInt(formData.year) : null,
           branch: formData.branch || null,
           githubUrl: formData.githubUrl || null,
@@ -100,502 +139,287 @@ export function ProfileClient({ user, isOwnProfile }: ProfileClientProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto pb-8">
+      {/* Profile Banner */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="card-double-bezel"
+        transition={{ duration: 0.4 }}
+        className="rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80 p-6 md:p-8 shadow-sm"
       >
-        <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-8">
-            <div className="relative flex-shrink-0">
-              <Avatar src={user.avatar} name={user.name} size="xl" />
-              {isOwnProfile && isEditing && (
-                <label className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-brand-primary flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
-                  <Camera className="h-5 w-5 text-white" aria-hidden="true" />
-                  <input type="file" accept="image/*" className="sr-only" onChange={(e) => console.log("Upload avatar", e.target.files?.[0])} />
-                </label>
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="relative flex-shrink-0 mx-auto md:mx-0">
+            <Avatar src={user.avatar} name={user.name} size="xl" className="h-24 w-24 border-2 border-[#F05438]/40" />
+            {isOwnProfile && (
+              <button
+                onClick={() => setShowAvatarModal(true)}
+                className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-[#F05438] text-white flex items-center justify-center shadow-md hover:scale-105 transition-transform"
+                title="Change profile picture"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap">
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white">{user.name}</h1>
+              <Badge variant="primary" className="bg-[#F05438] text-white text-xs">{user.role}</Badge>
+              <Badge variant="accent" className="text-xs">Level {user.level}</Badge>
+              {user.team && (
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                  {user.team.code}
+                </span>
               )}
             </div>
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-3 flex-wrap">
-                <h1 className="text-display-sm font-display font-bold text-foreground">{formData.name || user.name}</h1>
-                {isOwnProfile && isEditing && (
-                  <Button variant="ghost" size="icon" onClick={() => setIsEditing(false)}>
-                    <X className="h-5 w-5" />
-                  </Button>
-                )}
-              </div>
-              <div className="flex items-center justify-center md:justify-start gap-4 flex-wrap mb-4">
-                <Badge variant="primary">{user.role}</Badge>
-                <Badge variant="accent">Level {user.level}</Badge>
-                {user.team && <Badge variant="secondary">{user.team.code}</Badge>}
-              </div>
-              <div className="flex items-center justify-center md:justify-start gap-6 text-sm text-text-secondary flex-wrap">
-                <span className="flex items-center gap-1">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                  {user.email}
-                </span>
-                {user.year && (
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" aria-hidden="true" />
-                    Year {user.year}
-                  </span>
-                )}
-                {user.branch && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" aria-hidden="true" />
-                    {user.branch}
-                  </span>
-                )}
-              </div>
-              {isOwnProfile && !isEditing && (
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
-                  <Edit2 className="h-4 w-4" aria-hidden="true" />
-                  Edit Profile
-                </Button>
-              )}
+
+            <div className="flex items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate-500 dark:text-zinc-400 flex-wrap">
+              <span className="flex items-center gap-1">
+                <Mail className="h-3.5 w-3.5" />
+                {user.email}
+              </span>
+              {user.year && <span>Year {user.year}</span>}
+              {user.branch && <span>• {user.branch}</span>}
             </div>
-            <div className="flex flex-col items-center md:items-end gap-4 md:w-64">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-brand-accent">{formatNumber(user.xp)}</div>
-                <div className="text-sm text-text-muted">Total XP</div>
+
+            {isOwnProfile && !isEditing && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="rounded-2xl text-xs font-bold border border-slate-200 dark:border-zinc-800"
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+                Edit Profile
+              </Button>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center md:items-end gap-3 md:w-64 border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-zinc-800">
+            <div className="text-center md:text-right">
+              <div className="text-2xl font-black text-[#F05438]">{formatNumber(user.xp)} XP</div>
+              <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase">Total Points</div>
+            </div>
+            <div className="w-full">
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-500 dark:text-zinc-400 font-semibold">Level Progress</span>
+                <span className="font-bold text-[#F05438]">{Math.round(progress)}%</span>
               </div>
-              <div className="w-full">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-text-secondary">Level {user.level} Progress</span>
-                  <span className="text-sm font-bold text-brand-primary">{Math.round(progress)}%</span>
-                </div>
-                <div className="h-2 bg-surface-elevated rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(100, progress)}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-                    className="h-full bg-gradient-to-r from-brand-primary to-brand-secondary rounded-full"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-6 text-sm text-text-secondary w-full border-t border-border/30 pt-4">
-                <span className="flex items-center gap-1">
-                  <Flame className="h-4 w-4" aria-hidden="true" />
-                  {user.streakDays}d streak
-                </span>
-                <span className="flex items-center gap-1">
-                  <Award className="h-4 w-4" aria-hidden="true" />
-                  {user.achievements.length} badges
-                </span>
+              <div className="h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-full bg-[#F05438] rounded-full" style={{ width: `${Math.min(100, progress)}%` }} />
               </div>
             </div>
           </div>
-
-          {isOwnProfile && isEditing && (
-            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <Input label="Full Name" name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-                <Input label="Email" value={user.email} disabled />
-              </div>
-              <div className="grid md:grid-cols-3 gap-4">
-                <Input label="Year" name="year" type="number" min={1} max={4} value={formData.year} onChange={(e) => setFormData({ ...formData, year: e.target.value })} />
-                <Input label="Branch" name="branch" value={formData.branch} onChange={(e) => setFormData({ ...formData, branch: e.target.value })} />
-                <Input label="Skills (comma separated)" name="skills" value={formData.skills} onChange={(e) => setFormData({ ...formData, skills: e.target.value })} />
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <Input label="GitHub URL" name="githubUrl" type="url" value={formData.githubUrl} onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })} placeholder="https://github.com/username" icon={Github} />
-                <Input label="LinkedIn URL" name="linkedinUrl" type="url" value={formData.linkedinUrl} onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })} placeholder="https://linkedin.com/in/username" icon={Linkedin} />
-              </div>
-              <div className="flex justify-end gap-3 pt-4 border-t border-border/30">
-                <Button variant="secondary" type="button" onClick={() => setIsEditing(false)}>Cancel</Button>
-                <Button type="submit">Save Changes</Button>
-              </div>
-            </form>
-          )}
         </div>
+
+        {/* Edit Profile Form */}
+        {isOwnProfile && isEditing && (
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4 pt-6 border-t border-slate-100 dark:border-zinc-800">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Profile Picture URL</label>
+                <input
+                  type="text"
+                  placeholder="https://example.com/avatar.png"
+                  value={formData.avatar}
+                  onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Year</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={4}
+                  value={formData.year}
+                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Branch</label>
+                <input
+                  type="text"
+                  value={formData.branch}
+                  onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Skills</label>
+                <input
+                  type="text"
+                  value={formData.skills}
+                  onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                  placeholder="Python, ROS2, C++"
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="secondary" type="button" onClick={() => setIsEditing(false)} className="rounded-2xl text-xs font-bold">
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold">
+                Save Profile
+              </Button>
+            </div>
+          </form>
+        )}
       </motion.div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {["overview", "achievements", "activity", "settings"].map((tab) => (
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-200 dark:border-zinc-800 pb-2">
+        {["overview", "achievements", "activity"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
             className={cn(
-              "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ease-spring whitespace-nowrap",
+              "px-4 py-2 rounded-2xl text-xs font-bold transition-colors capitalize",
               activeTab === tab
-                ? "bg-brand-primary/20 text-brand-primary"
-                : "text-text-secondary hover:text-foreground hover:bg-surface-elevated/50"
+                ? "bg-[#F05438] text-white"
+                : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
             )}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab}
           </button>
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        {activeTab === "overview" && (
-          <motion.div
-            key="overview"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="grid lg:grid-cols-3 gap-6"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="lg:col-span-2 space-y-6"
-            >
-              <Card variant="elevated">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                    Stats Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[
-                    { label: "Total XP", value: formatNumber(user.xp), icon: Zap, color: "text-brand-accent" },
-                    { label: "Level", value: user.level, icon: Trophy, color: "text-brand-primary" },
-                    { label: "Streak", value: `${user.streakDays}d`, icon: Flame, color: "text-brand-secondary" },
-                    { label: "Badges", value: user.achievements.length, icon: Award, color: "text-brand-accent" },
-                  ].map((stat) => (
-                    <div key={stat.label} className="text-center p-4 rounded-xl bg-surface/50 border border-border/30">
-                      <div className="h-10 w-10 rounded-xl flex items-center justify-center mx-auto mb-2" style={{ backgroundColor: `${stat.color.replace("text-", "bg-")}20` }}>
-                        <stat.icon className="h-5 w-5" color={stat.color.replace("text-", "")} aria-hidden="true" />
-                      </div>
-                      <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                      <div className="text-xs text-text-muted">{stat.label}</div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {user.team && (
-                <Card variant="elevated">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                      Your Team: {user.team.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div className="p-4 rounded-xl bg-surface/50 border border-border/30">
-                          <div className="text-2xl font-bold text-brand-accent">{user.team.totalXp} XP</div>
-                          <div className="text-xs text-text-muted">Team XP</div>
-                        </div>
-                        <div className="p-4 rounded-xl bg-surface/50 border border-border/30">
-                          <div className="text-2xl font-bold text-brand-secondary">{user.team.progressPercent}%</div>
-                          <div className="text-xs text-text-muted">Progress</div>
-                        </div>
-                        <div className="p-4 rounded-xl bg-surface/50 border border-border/30">
-                          <div className="text-2xl font-bold text-foreground">{user.team.members.length}/4</div>
-                          <div className="text-xs text-text-muted">Members</div>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-foreground mb-3">Team Members</h4>
-                        <div className="flex flex-wrap gap-3">
-                          {user.team.members.map((member) => (
-                            <Link key={member.id} href={`/profile/${member.id}`} className="flex items-center gap-2 p-3 rounded-xl bg-surface/50 border border-border/30 hover:bg-surface-elevated/50 transition-colors">
-                              <Avatar src={member.avatar} name={member.name} size="sm" />
-                              <div className="min-w-0">
-                                <p className="font-medium text-foreground truncate">{member.name}</p>
-                                <p className="text-xs text-text-muted">Level {member.level} • {member.xp} XP</p>
-                              </div>
-                              {member.id === user.id && <Badge variant="primary" className="text-xs ml-auto">You</Badge>}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {!user.team && (
-                <Card variant="elevated">
-                  <CardContent className="text-center py-12">
-                    <Users className="h-12 w-12 mx-auto text-text-muted mb-4" aria-hidden="true" />
-                    <h3 className="text-heading-sm font-semibold text-foreground mb-2">No Team Yet</h3>
-                    <p className="text-text-secondary mb-4">Create or join a team to start your eYRC journey</p>
-                    <div className="flex justify-center gap-3">
-                      <Button asChild>
-                        <a href="/teams">Create Team</a>
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <a href="/teams">Join Team</a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-              className="space-y-6"
-            >
-              <Card variant="elevated">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                    Skills
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {user.skills.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {user.skills.map((skill) => (
-                        <Badge key={skill} variant="outline">{skill}</Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-text-secondary text-center py-4">No skills added yet</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card variant="elevated">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Github className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                    Links
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {user.githubUrl && (
-                    <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-surface/50 border border-border/30 hover:bg-surface-elevated/50 transition-colors group">
-                      <div className="h-8 w-8 rounded-lg bg-brand-primary/15 flex items-center justify-center">
-                        <Github className="h-4 w-4 text-brand-primary" aria-hidden="true" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground group-hover:text-brand-primary transition-colors">GitHub</p>
-                        <p className="text-xs text-text-muted truncate">{user.githubUrl}</p>
-                      </div>
-                    </a>
-                  )}
-                  {user.linkedinUrl && (
-                    <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-surface/50 border border-border/30 hover:bg-surface-elevated/50 transition-colors group">
-                      <div className="h-8 w-8 rounded-lg bg-brand-primary/15 flex items-center justify-center">
-                        <Linkedin className="h-4 w-4 text-brand-primary" aria-hidden="true" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground group-hover:text-brand-primary transition-colors">LinkedIn</p>
-                        <p className="text-xs text-text-muted truncate">{user.linkedinUrl}</p>
-                      </div>
-                    </a>
-                  )}
-                  {!user.githubUrl && !user.linkedinUrl && (
-                    <p className="text-text-secondary text-center py-4">No links added yet</p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {activeTab === "achievements" && (
-          <motion.div
-            key="achievements"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {user.achievements.map((ua, index) => {
-                const Icon = achievementIcons[ua.achievement.icon] || Trophy;
-                return (
-                  <motion.div
-                    key={ua.achievement.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
-                    className="card-double-bezel"
-                  >
-                    <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5">
-                      <div className="flex items-start gap-4">
-                        <div className="h-14 w-14 rounded-xl bg-brand-primary/15 flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-7 w-7 text-brand-primary" aria-hidden="true" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-semibold text-foreground">{ua.achievement.name}</h4>
-                            <CheckCircle className="h-4 w-4 text-brand-secondary" aria-hidden="true" />
-                          </div>
-                          <p className="text-sm text-text-secondary mb-2">{ua.achievement.description}</p>
-                          <div className="flex items-center gap-2 text-xs text-text-muted">
-                            <Badge variant="accent" className="text-xs">+{ua.achievement.xpBonus} XP</Badge>
-                            <span>{formatRelativeTime(ua.earnedAt)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-              {user.achievements.length === 0 && (
-                <div className="col-span-full card-double-bezel text-center py-12">
-                  <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-8">
-                    <Award className="h-16 w-16 mx-auto text-text-muted mb-4" aria-hidden="true" />
-                    <h3 className="text-heading-sm font-semibold text-foreground mb-2">No Achievements Yet</h3>
-                    <p className="text-text-secondary mb-4">Complete tasks, answer questions, and maintain streaks to unlock badges</p>
-                    <Button asChild>
-                      <a href="/forum">Start Participating</a>
-                    </Button>
-                  </div>
+      {/* Tab Content */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
+          {user.team && (
+            <div className="rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80 p-6 space-y-4 shadow-sm">
+              <h3 className="font-black text-slate-900 dark:text-white text-base">Your Team: {user.team.name}</h3>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900">
+                  <p className="text-lg font-black text-[#F05438]">{user.team.totalXp} XP</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Team XP</p>
                 </div>
-              )}
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900">
+                  <p className="text-lg font-black text-emerald-500">{user.team.progressPercent}%</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Progress</p>
+                </div>
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900">
+                  <p className="text-lg font-black text-slate-900 dark:text-white">{user.team.members.length}/4</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Members</p>
+                </div>
+              </div>
             </div>
-          </motion.div>
-        )}
+          )}
+        </div>
 
-        {activeTab === "activity" && (
-          <motion.div
-            key="activity"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="space-y-4"
-          >
-            {(user.xpLogs?.length ?? 0) > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-heading-sm font-semibold text-foreground">XP History</h3>
-                {(user.xpLogs || []).map((log, index) => (
-                  <motion.div
-                    key={log.createdAt}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.03 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-surface/50 border border-border/30"
-                  >
-                    <div className="h-10 w-10 rounded-xl bg-brand-primary/15 flex items-center justify-center">
-                      <Zap className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground">{log.reason.replace("_", " ")}</p>
-                      <p className="text-xs text-text-muted">{formatRelativeTime(log.createdAt)}</p>
-                    </div>
-                    <Badge variant="accent" className="font-bold">+{log.amount} XP</Badge>
-                  </motion.div>
+        <div>
+          <div className="rounded-3xl bg-white dark:bg-[#121215] border border-slate-200/80 dark:border-zinc-800/80 p-6 space-y-3 shadow-sm">
+            <h3 className="font-black text-slate-900 dark:text-white text-sm">Skills</h3>
+            {user.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {user.skills.map((skill) => (
+                  <span key={skill} className="text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                    {skill}
+                  </span>
                 ))}
               </div>
+            ) : (
+              <p className="text-xs text-slate-400">No skills added yet</p>
             )}
-            {user.forumPosts.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-heading-sm font-semibold text-foreground">Recent Forum Posts</h3>
-                {user.forumPosts.map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.03 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-surface/50 border border-border/30"
-                  >
-                    <div className="h-10 w-10 rounded-xl bg-brand-secondary/15 flex items-center justify-center">
-                      <MessageSquare className="h-5 w-5 text-brand-secondary" aria-hidden="true" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{post.title}</p>
-                      <p className="text-xs text-text-muted">{formatRelativeTime(post.createdAt)} • {post._count.answers} answers</p>
-                    </div>
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={`/forum/${post.id}`}>
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-            {(user.xpLogs?.length ?? 0) === 0 && user.forumPosts.length === 0 && (
-              <div className="card-double-bezel text-center py-12">
-                <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-8">
-                  <BookOpen className="h-12 w-12 mx-auto text-text-muted mb-4" aria-hidden="true" />
-                  <h3 className="text-heading-sm font-semibold text-foreground mb-2">No Activity Yet</h3>
-                  <p className="text-text-secondary">Your activity will appear here as you participate</p>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
+          </div>
+        </div>
+      </div>
 
-        {activeTab === "settings" && isOwnProfile && (
+      {/* Profile Picture Uploader Modal */}
+      <AnimatePresence>
+        {showAvatarModal && (
           <motion.div
-            key="settings"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="space-y-6 max-w-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowAvatarModal(false)}
           >
-            <Card variant="elevated">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                  Preferences
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="font-medium text-foreground mb-3">Notifications</h4>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Task deadline reminders", description: "Get notified 72h, 24h, and 4h before deadlines" },
-                      { label: "Forum replies", description: "Notifications when someone replies to your posts" },
-                      { label: "Best answer alerts", description: "When your answer is marked as best" },
-                      { label: "Achievement unlocks", description: "Celebrate your badge earnings" },
-                      { label: "Weekly digest", description: "Summary of your week's progress every Monday" },
-                    ].map((item) => (
-                      <label key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-surface/50 border border-border/30 cursor-pointer">
-                        <div>
-                          <p className="font-medium text-foreground">{item.label}</p>
-                          <p className="text-xs text-text-muted">{item.description}</p>
-                        </div>
-                        <input type="checkbox" defaultChecked className="h-5 w-5 rounded border-border text-brand-primary focus:ring-brand-primary" />
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="border-t border-border/30 pt-6">
-                  <h4 className="font-medium text-foreground mb-3">Theme</h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    {["dark", "light", "system"].map((theme) => (
-                      <button key={theme} className={cn(
-                        "p-4 rounded-xl border-2 transition-all duration-300 ease-spring",
-                        theme === "dark" ? "border-brand-primary bg-brand-primary/10" : "border-border hover:border-brand-primary/50"
-                      )}>
-                        <span className="text-sm font-medium text-foreground capitalize">{theme}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md rounded-3xl bg-white dark:bg-[#121215] border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">Change Profile Picture</h2>
+                <button onClick={() => setShowAvatarModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-            <Card variant="elevated" className="border-brand-danger/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-brand-danger">
-                  <AlertCircle className="h-5 w-5" aria-hidden="true" />
-                  Danger Zone
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-brand-danger/10 border border-brand-danger/30">
-                  <div>
-                    <p className="font-medium text-brand-danger">Leave Team</p>
-                    <p className="text-xs text-text-muted">You will be removed from your current team</p>
-                  </div>
-                  <Button variant="danger" size="sm">Leave Team</Button>
+              {/* Upload File */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">Upload Image File</label>
+                <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-zinc-800 hover:border-[#F05438] cursor-pointer transition-colors bg-slate-50/50 dark:bg-zinc-900/50">
+                  <Upload className="h-6 w-6 text-[#F05438] mb-2" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-zinc-300">Click to choose image file</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">PNG, JPG, WEBP up to 2MB</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                </label>
+              </div>
+
+              {/* Preset Avatars */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">Or Select a Preset Avatar</label>
+                <div className="flex items-center gap-3 overflow-x-auto pb-2">
+                  {PRESET_AVATARS.map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt="Preset"
+                      onClick={() => setCustomAvatarUrl(url)}
+                      className={cn(
+                        "h-12 w-12 rounded-full object-cover cursor-pointer border-2 transition-all flex-shrink-0",
+                        customAvatarUrl === url ? "border-[#F05438] scale-110 shadow-md" : "border-transparent opacity-70 hover:opacity-100"
+                      )}
+                    />
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              {/* Custom Image URL */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">Image URL</label>
+                <input
+                  type="text"
+                  placeholder="https://..."
+                  value={customAvatarUrl}
+                  onChange={(e) => setCustomAvatarUrl(e.target.value)}
+                  className="w-full rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-4 py-2.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#F05438]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="secondary" onClick={() => setShowAvatarModal(false)} className="rounded-2xl text-xs font-bold">
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!customAvatarUrl || isUploading}
+                  onClick={() => handleSaveAvatar(customAvatarUrl)}
+                  className="bg-[#F05438] text-white hover:bg-[#D94328] rounded-2xl text-xs font-bold"
+                >
+                  {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Avatar"}
+                </Button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

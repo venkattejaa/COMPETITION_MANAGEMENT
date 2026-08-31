@@ -337,7 +337,7 @@ export function ThemeDetailClient({ theme }: ThemeDetailClientProps) {
               </Link>
             </Button>
             <Button variant="secondary" size="lg" asChild>
-              <Link href="/teams/preferences?theme={theme.code}">
+              <Link href={`/teams/preferences?theme=${theme.code}`}>
                 Select as Preference
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Link>
