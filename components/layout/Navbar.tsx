@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Menu, X, Users, Trophy, BookOpen, LayoutDashboard, LogOut, User, Settings, Bell, ChevronDown, Bot } from "lucide-react";
 
@@ -138,7 +139,10 @@ export function Navbar({ user, isAdmin }: { user: any; isAdmin: boolean }) {
                     Settings
                   </Link>
                   <div className="divider my-2" />
-                  <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-danger hover:bg-brand-danger/10 transition-colors">
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-danger hover:bg-brand-danger/10 transition-colors"
+                  >
                     <LogOut className="h-4 w-4" aria-hidden="true" />
                     Sign Out
                   </button>
