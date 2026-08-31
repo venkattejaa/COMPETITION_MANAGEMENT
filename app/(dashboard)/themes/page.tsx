@@ -1,23 +1,24 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { getCachedAuthUser } from "@/lib/get-cached-user";
+import { prisma } from "@/lib/prisma";
 import { ThemesClient } from "./ThemesClient";
 
 export default async function ThemesPage() {
-  const session = await auth();
+  const [user, themes] = await Promise.all([
+    getCachedAuthUser(),
+    prisma.theme.findMany({
+      include: {
+        objectives: { orderBy: { order: "asc" } },
+        roadmaps: { orderBy: { weekNumber: "asc" } },
+        resources: true,
+      },
+      orderBy: { code: "asc" },
+    }),
+  ]);
 
-  if (!session?.user) {
+  if (!user) {
     redirect("/login");
   }
-
-  const themes = await prisma.theme.findMany({
-    include: {
-      objectives: { orderBy: { order: "asc" } },
-      roadmaps: { orderBy: { weekNumber: "asc" } },
-      resources: true,
-    },
-    orderBy: { code: "asc" },
-  });
 
   return <ThemesClient themes={themes} />;
 }
