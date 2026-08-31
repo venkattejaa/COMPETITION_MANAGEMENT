@@ -4,8 +4,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn, getThemeColor, getDifficultyColor } from "@/lib/utils";
-import { Bot, ArrowRight, Target, Users, BookOpen, Clock, Zap, Shield, CheckCircle, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/Card";
+import {
+  Bot, ArrowRight, Target, BookOpen, Zap, Shield, ChevronDown, ChevronUp,
+  ExternalLink, Layers, Cpu, Award
+} from "lucide-react";
 import { Badge, Tag } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -43,312 +45,265 @@ export function ThemesClient({ themes }: ThemesClientProps) {
   };
 
   return (
-    <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      >
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground">eYRC 2026-27 Themes</h1>
-          <p className="text-body text-text-secondary mt-1">Explore all 7 competition themes and find your perfect match</p>
+          <div className="flex items-center gap-2 mb-1">
+            <Bot className="h-5 w-5 text-blue-400" />
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-400">eYRC 2026-27</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Competition Themes</h1>
+          <p className="text-slate-400 text-sm mt-1">Explore all 7 robotics themes, objectives, and week-by-week roadmaps.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setViewMode("grid")} aria-pressed={viewMode === "grid"}>
-            <div className="h-5 w-5 grid grid-cols-2 gap-1" aria-hidden="true">
-              <div className="bg-brand-primary/20 rounded" />
-              <div className="bg-brand-primary/20 rounded" />
-              <div className="bg-brand-primary/20 rounded" />
-              <div className="bg-brand-primary/20 rounded" />
-            </div>
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setViewMode("list")} aria-pressed={viewMode === "list"}>
-            <div className="h-5 w-5 flex flex-col gap-1" aria-hidden="true">
-              <div className="h-1 bg-brand-primary/20 rounded w-full" />
-              <div className="h-1 bg-brand-primary/20 rounded w-full" />
-              <div className="h-1 bg-brand-primary/20 rounded w-full" />
-            </div>
-          </Button>
-        </div>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-        className="card-double-bezel overflow-hidden"
-      >
-        <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5">
-          <div className="overflow-x-auto">
-            <table className="w-full" role="table">
-              <thead>
-                <tr className="border-b border-border/30">
-                  <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted">Theme</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted hidden md:table-cell">Description</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted hidden lg:table-cell">Tech Stack</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted">Difficulty</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted hidden sm:table-cell">Years</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted">Mode</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium uppercase tracking-[0.15em] text-text-muted">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {themes.map((theme, index) => (
-                  <motion.tr
-                    key={theme.code}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
-                    className={cn("border-b border-border/20 transition-colors", selectedTheme === theme.code && "bg-brand-primary/5")}
-                  >
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${getThemeColor(theme.code)}20` }}>
-                          <span className="text-xl font-bold" style={{ color: getThemeColor(theme.code) }}>{theme.code}</span>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">{theme.name}</p>
-                          <p className="text-sm text-text-muted">{theme.tagline}</p>
-                        </div>
+        <div className="flex items-center gap-2 bg-slate-900/60 border border-slate-800 p-1 rounded-xl self-start sm:self-auto">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5",
+              viewMode === "grid" ? "bg-blue-500 text-white shadow-md" : "text-slate-400 hover:text-white"
+            )}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            Grid
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5",
+              viewMode === "list" ? "bg-blue-500 text-white shadow-md" : "text-slate-400 hover:text-white"
+            )}
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            Table
+          </button>
+        </div>
+      </div>
+
+      {/* Grid View (Mobile First & Default) */}
+      {viewMode === "grid" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {themes.map((theme, index) => {
+            const themeColor = getThemeColor(theme.code);
+            const isExpanded = selectedTheme === theme.code;
+
+            return (
+              <motion.div
+                key={theme.code}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                className="flex flex-col"
+              >
+                <div
+                  className={cn(
+                    "rounded-2xl border bg-slate-800/40 backdrop-blur-sm p-6 flex flex-col justify-between h-full transition-all duration-300 hover:bg-slate-800/70 hover:shadow-xl",
+                    isExpanded ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-700/50 hover:border-slate-600"
+                  )}
+                >
+                  <div>
+                    {/* Badge & Code */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div
+                        className="h-12 w-12 rounded-xl flex items-center justify-center font-extrabold text-xl shadow-inner"
+                        style={{ backgroundColor: `${themeColor}20`, color: themeColor }}
+                      >
+                        {theme.code}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 hidden md:table-cell">
-                      <p className="text-sm text-text-secondary max-w-xs truncate">{theme.description}</p>
-                    </td>
-                    <td className="px-4 py-4 hidden lg:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {theme.techStack.slice(0, 4).map((tech) => (
-                          <Tag key={tech} variant="default" className="text-[0.55rem]">{tech}</Tag>
-                        ))}
-                        {theme.techStack.length > 4 && (
-                          <Tag variant="default" className="text-[0.55rem]">+{theme.techStack.length - 4} more</Tag>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Badge variant="outline" className="text-xs" style={{ borderColor: getDifficultyColor(theme.difficulty), color: getDifficultyColor(theme.difficulty) }}>
+                      <Badge
+                        variant="outline"
+                        className="text-xs font-semibold px-2.5 py-0.5"
+                        style={{ borderColor: getDifficultyColor(theme.difficulty), color: getDifficultyColor(theme.difficulty) }}
+                      >
                         {difficultyLabels[theme.difficulty as keyof typeof difficultyLabels]}
                       </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-center hidden sm:table-cell">
-                      <span className="text-sm text-text-secondary">{theme.years.join(", ")}<sup className="text-xs">th</sup> Year</span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Badge variant="outline" className="text-xs">{theme.mode}</Badge>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Button size="sm" variant={selectedTheme === theme.code ? "primary" : "outline"} onClick={() => handleThemeClick(theme.code)}>
-                        {selectedTheme === theme.code ? (
-                          <>
-                            <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
-                            Collapse
-                          </>
-                        ) : (
-                          <>
-                            Details
-                            <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
-                          </>
-                        )}
-                      </Button>
-                    </td>
-                  </motion.tr>
-                ))}
+                    </div>
+
+                    {/* Title & Tagline */}
+                    <h3 className="font-extrabold text-white text-xl mb-1.5">{theme.name}</h3>
+                    <p className="text-slate-400 text-xs line-clamp-2 mb-4 leading-relaxed">{theme.tagline}</p>
+
+                    {/* Meta pills */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-900/60 border border-slate-700/50 text-slate-300 font-medium">
+                        {theme.mode}
+                      </span>
+                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-900/60 border border-slate-700/50 text-slate-300 font-medium">
+                        Eligible: Year {theme.years.join(", ")}
+                      </span>
+                    </div>
+
+                    {/* Tech Stack */}
+                    <div className="mb-6">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tech Stack</p>
+                      <div className="flex flex-wrap gap-1">
+                        {theme.techStack.map((tech) => (
+                          <span key={tech} className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 pt-4 border-t border-slate-700/40 mt-auto">
+                    <Link
+                      href={`/themes/${theme.code}`}
+                      className="flex-1 py-2 rounded-xl bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-blue-600 transition-colors shadow-md shadow-blue-500/20"
+                    >
+                      Explore Theme
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <button
+                      onClick={() => handleThemeClick(theme.code)}
+                      className="px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/40 text-slate-300 text-xs font-semibold hover:text-white hover:bg-slate-800 transition-colors"
+                    >
+                      {isExpanded ? "Hide" : "Preview"}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* List / Table View (Desktop & Responsive Table) */}
+      {viewMode === "list" && (
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 backdrop-blur-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse" role="table">
+              <thead>
+                <tr className="border-b border-slate-700/60 bg-slate-900/40">
+                  <th className="px-5 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Theme</th>
+                  <th className="px-5 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Tech Stack</th>
+                  <th className="px-5 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Difficulty</th>
+                  <th className="px-5 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center hidden sm:table-cell">Mode</th>
+                  <th className="px-5 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700/40">
+                {themes.map((theme) => {
+                  const themeColor = getThemeColor(theme.code);
+                  return (
+                    <tr key={theme.code} className="hover:bg-slate-800/60 transition-colors">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-base flex-shrink-0" style={{ backgroundColor: `${themeColor}20`, color: themeColor }}>
+                            {theme.code}
+                          </div>
+                          <div>
+                            <p className="font-bold text-white text-sm">{theme.name}</p>
+                            <p className="text-xs text-slate-400 line-clamp-1 max-w-xs">{theme.tagline}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 hidden md:table-cell">
+                        <div className="flex flex-wrap gap-1 max-w-xs">
+                          {theme.techStack.slice(0, 3).map((t) => (
+                            <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-900 text-slate-300 font-mono">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded border" style={{ borderColor: getDifficultyColor(theme.difficulty), color: getDifficultyColor(theme.difficulty) }}>
+                          {difficultyLabels[theme.difficulty as keyof typeof difficultyLabels]}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-center hidden sm:table-cell">
+                        <span className="text-xs text-slate-300">{theme.mode}</span>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <Link
+                          href={`/themes/${theme.code}`}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300"
+                        >
+                          Details <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
-      </motion.div>
+      )}
 
+      {/* Expanded Theme Preview Drawer */}
       <AnimatePresence>
         {selectedTheme && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="space-y-6"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="rounded-2xl border border-blue-500/40 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-8 space-y-6 shadow-2xl"
           >
-            {themes.map((theme) =>
-              theme.code === selectedTheme && (
-                <motion.div
-                  key={theme.code}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="space-y-6"
-                >
-                  <div className="card-double-bezel">
-                    <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6 md:p-8">
-                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
-                        <div className="flex items-start gap-4">
-                          <div className="h-16 w-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${getThemeColor(theme.code)}20` }}>
-                            <span className="text-2xl font-bold" style={{ color: getThemeColor(theme.code) }}>{theme.code}</span>
-                          </div>
-                          <div>
-                            <h2 className="text-display-sm font-display font-bold text-foreground">{theme.name}</h2>
-                            <p className="text-body text-text-secondary mt-1">{theme.tagline}</p>
-                            <div className="flex flex-wrap items-center gap-3 mt-4">
-                              <Badge variant="outline" style={{ borderColor: getDifficultyColor(theme.difficulty), color: getDifficultyColor(theme.difficulty) }}>
-                                {difficultyLabels[theme.difficulty as keyof typeof difficultyLabels]}
-                              </Badge>
-                              <Badge variant="outline">{theme.mode}</Badge>
-                              <Badge variant="outline">{theme.years.join(", ")}<sup>th</sup> Year Eligible</Badge>
-                            </div>
-                          </div>
-                        </div>
-                        <Button size="lg" asChild className="md:w-auto">
-                          <Link href={`/themes/${theme.code}`}>
-                            View Full Details
-                            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                          </Link>
-                        </Button>
-                      </div>
-
-                      <div className="prose max-w-none">
-                        <p className="text-body text-text-secondary">{theme.description}</p>
-                      </div>
+            {themes
+              .filter((t) => t.code === selectedTheme)
+              .map((theme) => (
+                <div key={theme.code} className="space-y-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
+                    <div>
+                      <span className="text-xs font-bold text-blue-400 tracking-widest uppercase">Quick Preview</span>
+                      <h2 className="text-2xl font-extrabold text-white">{theme.name}</h2>
                     </div>
+                    <Link
+                      href={`/themes/${theme.code}`}
+                      className="px-4 py-2 rounded-xl bg-blue-500 text-white font-bold text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
+                    >
+                      Open Full Roadmap & Details <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="card-double-bezel">
-                      <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <Target className="h-5 w-5 text-brand-primary" aria-hidden="true" />
-                          <h3 className="text-heading-sm font-semibold text-foreground">Mission Objectives</h3>
-                        </div>
-                        <ol className="space-y-3">
-                          {theme.objectives.map((obj, i) => (
-                            <li key={obj.id} className="flex items-start gap-3 p-3 rounded-xl bg-surface/50 border border-border/30">
-                              <span className="flex-shrink-0 h-6 w-6 rounded-full bg-brand-primary/15 flex items-center justify-center text-brand-primary text-sm font-bold">{i + 1}</span>
-                              <div>
-                                <p className="font-medium text-foreground">{obj.title}</p>
-                                <p className="text-sm text-text-secondary">{obj.description}</p>
-                              </div>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
+                  <p className="text-slate-300 text-sm leading-relaxed">{theme.description}</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Objectives */}
+                    <div className="rounded-xl bg-slate-800/50 p-4 border border-slate-700/50">
+                      <h4 className="font-bold text-white text-sm flex items-center gap-2 mb-3">
+                        <Target className="w-4 h-4 text-blue-400" />
+                        Mission Objectives ({theme.objectives.length})
+                      </h4>
+                      <ul className="space-y-2 text-xs text-slate-300">
+                        {theme.objectives.map((obj, i) => (
+                          <li key={obj.id} className="flex items-start gap-2">
+                            <span className="h-4 w-4 rounded-full bg-blue-500/20 text-blue-400 font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+                              {i + 1}
+                            </span>
+                            <span>{obj.title}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
-                    <div className="card-double-bezel">
-                      <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <BookOpen className="h-5 w-5 text-brand-secondary" aria-hidden="true" />
-                          <h3 className="text-heading-sm font-semibold text-foreground">Learning Roadmap</h3>
-                        </div>
-                        <div className="space-y-3 max-h-96 overflow-y-auto">
-                          {theme.roadmaps.map((week) => (
-                            <div key={week.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface/50 border border-border/30">
-                              <div className="flex-shrink-0 w-14 text-center">
-                                <div className="h-7 w-7 rounded-full bg-brand-secondary/15 flex items-center justify-center mx-auto mb-1 text-brand-secondary font-bold text-sm">W{week.weekNumber}</div>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-foreground">{week.title}</p>
-                                <p className="text-sm text-text-secondary">{week.description}</p>
-                              </div>
-                              <Badge variant="outline" className="text-xs">{week.estimatedHours}h</Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card-double-bezel">
-                    <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-5 w-5 text-brand-accent" aria-hidden="true" />
-                          <h3 className="text-heading-sm font-semibold text-foreground">Tech Stack</h3>
-                        </div>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/themes/${theme.code}/resources`}>
-                            View All Resources
-                            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                          </Link>
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {theme.techStack.map((tech) => (
-                          <Tag key={tech} variant="primary">{tech}</Tag>
+                    {/* Learning Roadmap */}
+                    <div className="rounded-xl bg-slate-800/50 p-4 border border-slate-700/50">
+                      <h4 className="font-bold text-white text-sm flex items-center gap-2 mb-3">
+                        <BookOpen className="w-4 h-4 text-emerald-400" />
+                        Roadmap Overview ({theme.roadmaps.length} Weeks)
+                      </h4>
+                      <div className="space-y-2 text-xs text-slate-300 max-h-48 overflow-y-auto">
+                        {theme.roadmaps.map((week) => (
+                          <div key={week.id} className="flex justify-between items-center bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-700/40">
+                            <span className="font-semibold text-white">W{week.weekNumber}: {week.title}</span>
+                            <span className="text-[10px] text-slate-400">{week.estimatedHours}h</span>
+                          </div>
                         ))}
                       </div>
                     </div>
                   </div>
-
-                  <div className="card-double-bezel">
-                    <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <Shield className="h-5 w-5 text-brand-secondary" aria-hidden="true" />
-                          <h3 className="text-heading-sm font-semibold text-foreground">Curated Resources</h3>
-                        </div>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/themes/${theme.code}/resources`}>
-                            Browse All
-                            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                          </Link>
-                        </Button>
-                      </div>
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {theme.resources.slice(0, 6).map((resource) => (
-                          <Link key={resource.id} href={resource.url || `#`} className="flex items-center gap-3 p-3 rounded-xl bg-surface/50 border border-border/30 hover:bg-surface-elevated/50 hover:border-brand-primary/50 transition-all duration-300 ease-spring group" target={resource.url ? "_blank" : undefined} rel={resource.url ? "noopener noreferrer" : undefined}>
-                            <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${getThemeColor(theme.code)}20` }}>
-                              <ExternalLink className="h-4 w-4" color={getThemeColor(theme.code)} aria-hidden="true" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-foreground group-hover:text-brand-primary transition-colors truncate">{resource.title}</p>
-                              <p className="text-xs text-text-muted capitalize">{resource.type.toLowerCase()}</p>
-                            </div>
-                          </Link>
-                        ))}
-                        {theme.resources.length > 6 && (
-                          <Link href={`/themes/${theme.code}/resources`} className="flex items-center justify-center gap-2 p-3 rounded-xl bg-surface/50 border border-border/30 hover:bg-surface-elevated/50 hover:border-brand-primary/50 transition-all duration-300 ease-spring">
-                            <span className="text-sm font-medium text-text-secondary">+{theme.resources.length - 6} more resources</span>
-                            <ExternalLink className="h-4 w-4 text-text-muted" aria-hidden="true" />
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            )}
+                </div>
+              ))}
           </motion.div>
         )}
       </AnimatePresence>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-        className="card-double-bezel"
-      >
-        <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-8 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Bot className="h-6 w-6 text-brand-primary" aria-hidden="true" />
-            <h3 className="text-heading-lg font-semibold text-foreground">Ready to Choose?</h3>
-          </div>
-          <p className="text-body text-text-secondary max-w-2xl mx-auto mb-6">
-            Each theme offers a unique journey. Discuss with your team, review the roadmaps, and submit your top 2 preferences before the deadline.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" asChild>
-              <Link href="/teams/preferences">
-                Submit Preferences
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button variant="secondary" size="lg" asChild>
-              <Link href="/forum?tag=theme-selection">
-                Discuss with Peers
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 }
+
+export default ThemesClient;

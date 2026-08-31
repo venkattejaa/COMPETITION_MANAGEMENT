@@ -4,8 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn, formatRelativeTime, truncate } from "@/lib/utils";
-import { MessageSquare, Search, Filter, ChevronDown, ChevronUp, ArrowUp, ArrowDown, CheckCircle, Flag, Clock, BookOpen, Users, Zap, MoreHorizontal } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/Card";
+import { MessageSquare, Search, CheckCircle, Clock, Zap, Plus, X } from "lucide-react";
 import { Badge, Tag } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -49,11 +48,11 @@ export function ForumClient({ posts, themes, userId }: ForumClientProps) {
   const [selectedUrgency, setSelectedUrgency] = useState("ALL");
   const [selectedTheme, setSelectedTheme] = useState("ALL");
   const [sortBy, setSortBy] = useState("RECENT");
-  const [showFilters, setShowFilters] = useState(false);
   const [creatingPost, setCreatingPost] = useState(false);
 
   const filteredPosts = posts.filter((post) => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "ALL" || post.category === selectedCategory;
     const matchesUrgency = selectedUrgency === "ALL" || post.urgency === selectedUrgency;
@@ -77,140 +76,167 @@ export function ForumClient({ posts, themes, userId }: ForumClientProps) {
   });
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      >
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground">Discussion Forum</h1>
-          <p className="text-body text-text-secondary mt-1">Ask questions, share knowledge, help peers</p>
-        </div>
-        <Button onClick={() => setCreatingPost(true)} className="whitespace-nowrap">
-          <MessageSquare className="h-4 w-4" aria-hidden="true" />
-          New Post
-        </Button>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-        className="card-double-bezel"
-      >
-        <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" aria-hidden="true" />
-              <input
-                type="text"
-                placeholder="Search questions, tags, content..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-base pl-10"
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="input-base min-w-[140px] appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat === "ALL" ? "All Categories" : cat.replace("_", " ")}</option>
-                ))}
-              </select>
-              <select
-                value={selectedUrgency}
-                onChange={(e) => setSelectedUrgency(e.target.value)}
-                className="input-base min-w-[120px] appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8"
-              >
-                {urgencies.map((urg) => (
-                  <option key={urg} value={urg}>{urg === "ALL" ? "All Urgency" : urg}</option>
-                ))}
-              </select>
-              <select
-                value={selectedTheme}
-                onChange={(e) => setSelectedTheme(e.target.value)}
-                className="input-base min-w-[140px] appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8"
-              >
-                <option value="ALL">All Themes</option>
-                {themes.map((t) => (
-                  <option key={t.code} value={t.code}>{t.code} - {t.name}</option>
-                ))}
-              </select>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="input-base min-w-[160px] appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8"
-              >
-                <option value="RECENT">Newest First</option>
-                <option value="OLDEST">Oldest First</option>
-                <option value="MOST_VOTES">Most Upvotes</option>
-                <option value="MOST_ANSWERS">Most Answers</option>
-                <option value="UNANSWERED">Unanswered</option>
-              </select>
-            </div>
+          <div className="flex items-center gap-2 mb-1">
+            <MessageSquare className="h-5 w-5 text-purple-400" />
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-400">Community Support</span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Discussion Forum</h1>
+          <p className="text-slate-400 text-sm mt-1">Ask questions, share code snippets, resolve bugs with peers.</p>
         </div>
-      </motion.div>
+        <Button onClick={() => setCreatingPost(true)} className="whitespace-nowrap bg-purple-600 hover:bg-purple-700 text-white self-start sm:self-auto">
+          <Plus className="h-4 w-4 mr-1" />
+          New Discussion
+        </Button>
+      </div>
 
+      {/* Search & Filter Bar */}
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 backdrop-blur-sm p-4 space-y-4">
+        <div className="relative w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search questions, code bugs, topics..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-900/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-xl text-xs text-slate-200 focus:outline-none"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat === "ALL" ? "All Categories" : cat.replace("_", " ")}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedUrgency}
+            onChange={(e) => setSelectedUrgency(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-xl text-xs text-slate-200 focus:outline-none"
+          >
+            {urgencies.map((urg) => (
+              <option key={urg} value={urg}>
+                {urg === "ALL" ? "All Urgency" : urg}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedTheme}
+            onChange={(e) => setSelectedTheme(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-xl text-xs text-slate-200 focus:outline-none"
+          >
+            <option value="ALL">All Themes</option>
+            {themes.map((t) => (
+              <option key={t.code} value={t.code}>
+                {t.code} - {t.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700/60 rounded-xl text-xs text-slate-200 focus:outline-none"
+          >
+            <option value="RECENT">Newest First</option>
+            <option value="OLDEST">Oldest First</option>
+            <option value="MOST_VOTES">Most Upvotes</option>
+            <option value="MOST_ANSWERS">Most Answers</option>
+            <option value="UNANSWERED">Unanswered</option>
+          </select>
+        </div>
+      </div>
+
+      {/* New Post Modal */}
       <AnimatePresence>
         {creatingPost && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             onClick={() => setCreatingPost(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-surface backdrop-blur-2xl border border-border/50 p-6"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-slate-900 border border-slate-700 p-6 space-y-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-heading-lg font-semibold text-foreground">Create New Post</h2>
-                <button onClick={() => setCreatingPost(false)} className="btn-icon text-text-secondary hover:text-foreground">
-                  <MoreHorizontal className="h-5 w-5" />
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <h2 className="text-lg font-bold text-white">Ask Community / Post Bug</h2>
+                <button onClick={() => setCreatingPost(false)} className="text-slate-400 hover:text-white">
+                  <X className="h-5 w-5" />
                 </button>
               </div>
-              <form className="space-y-4">
-                <Input label="Title" placeholder="What's your question?" required />
-                <select className="input-base appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8">
-                  <option value="">Select Category</option>
-                  {categories.filter(c => c !== "ALL").map((cat) => (
-                    <option key={cat} value={cat}>{cat.replace("_", " ")}</option>
-                  ))}
-                </select>
-                <select className="input-base appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8">
-                  <option value="">Select Theme (optional)</option>
-                  {themes.map((t) => (
-                    <option key={t.code} value={t.code}>{t.code} - {t.name}</option>
-                  ))}
-                </select>
-                <select className="input-base appearance-none bg-[url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394A3B8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-3 pr-8">
-                  <option value="LOW">Low Urgency</option>
-                  <option value="MEDIUM">Medium Urgency</option>
-                  <option value="HIGH">High Urgency</option>
-                  <option value="BLOCKER">Blocker - Critical</option>
-                </select>
+
+              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setCreatingPost(false); }}>
                 <div>
-                  <label className="label-base">Description (Markdown supported)</label>
-                  <textarea className="input-base min-h-[200px] font-mono text-sm" placeholder="Describe your issue in detail..." required />
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Title</label>
+                  <input
+                    type="text"
+                    placeholder="E.g., MFRC522 RFID read error on Logic Quest"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                    required
+                  />
                 </div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="h-4 w-4 rounded border-border text-brand-primary focus:ring-brand-primary" />
-                  <span className="text-sm text-text-secondary">Post anonymously</span>
-                </label>
-                <div className="flex justify-end gap-3 pt-4 border-t border-border/30">
-                  <Button variant="secondary" type="button" onClick={() => setCreatingPost(false)}>Cancel</Button>
-                  <Button type="submit">Post Question</Button>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">Category</label>
+                    <select className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
+                      {categories.filter(c => c !== "ALL").map((cat) => (
+                        <option key={cat} value={cat}>{cat.replace("_", " ")}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">Theme (Optional)</label>
+                    <select className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
+                      <option value="">General</option>
+                      {themes.map((t) => (
+                        <option key={t.code} value={t.code}>{t.code}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Detailed Explanation</label>
+                  <textarea
+                    rows={4}
+                    placeholder="Provide relevant details, error logs, or code blocks..."
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 font-mono"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setCreatingPost(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700"
+                  >
+                    Submit Question
+                  </button>
                 </div>
               </form>
             </motion.div>
@@ -218,89 +244,84 @@ export function ForumClient({ posts, themes, userId }: ForumClientProps) {
         )}
       </AnimatePresence>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        className={sortedPosts.length === 0 ? "hidden" : ""}
-      >
-        <div className="space-y-3">
-          {sortedPosts.map((post, index) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
-              className="card-double-bezel group"
-            >
-              <Link href={`/forum/${post.id}`} className="block">
-                <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-5 transition-all duration-300 ease-spring hover:border-brand-primary/50 hover:shadow-card-hover">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 text-center">
-                      <div className={cn(
-                        "h-8 w-8 rounded-full flex items-center justify-center mx-auto mb-1 font-bold text-sm",
-                        post.isSolved ? "bg-brand-secondary/20 text-brand-secondary" : "bg-brand-primary/20 text-brand-primary"
-                      )}>
-                        {post.isSolved ? <CheckCircle className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
-                      </div>
-                      <span className="text-xs text-text-muted">{post._count.answers} answers</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2 mb-2">
-                        <h3 className="font-semibold text-foreground line-clamp-1 flex-1">{post.title}</h3>
-                        {post.isSolved && <Badge variant="secondary" className="text-xs flex-shrink-0"><CheckCircle className="h-3 w-3" /> Solved</Badge>}
-                      </div>
-                      <p className="text-sm text-text-secondary line-clamp-2 mb-3">{truncate(post.content, 200)}</p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
-                        {post.themeTag && (
-                          <Tag variant="primary">{post.themeTag}</Tag>
-                        )}
-                        <Tag variant="outline">{post.category.replace("_", " ")}</Tag>
-                        <Tag variant={post.urgency === "BLOCKER" ? "danger" : post.urgency === "HIGH" ? "accent" : "outline"}>{post.urgency}</Tag>
-                        {post.isAnonymous && <Tag variant="outline">Anonymous</Tag>}
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" aria-hidden="true" />
-                          {formatRelativeTime(post.createdAt)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Zap className="h-3 w-3" aria-hidden="true" />
-                          {post.upvotes} votes
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Avatar src={post.author.avatar} name={post.author.name} size="sm" />
-                      <div className="text-right hidden sm:block">
-                        <p className="font-medium text-foreground">{post.isAnonymous ? "Anonymous" : post.author.name}</p>
-                        <p className="text-xs text-text-muted">Level {post.author.level} • {post.author.xp} XP</p>
-                      </div>
-                    </div>
+      {/* Posts List */}
+      <div className="space-y-3">
+        {sortedPosts.map((post, index) => (
+          <motion.article
+            key={post.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04 }}
+          >
+            <Link href={`/forum/${post.id}`} className="block">
+              <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 hover:bg-slate-800/70 p-4 sm:p-5 transition-all group">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {post.isSolved ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" /> Solved
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        {post.category.replace("_", " ")}
+                      </span>
+                    )}
+
+                    {post.themeTag && (
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        {post.themeTag}
+                      </span>
+                    )}
+
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 text-slate-400 font-mono">
+                      {post.urgency}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <Avatar src={post.author.avatar} name={post.author.name} size="sm" />
+                    <span className="font-semibold text-slate-300">{post.isAnonymous ? "Anonymous" : post.author.name}</span>
+                    <span>•</span>
+                    <span className="text-[11px]">{formatRelativeTime(post.createdAt)}</span>
                   </div>
                 </div>
-              </Link>
-            </motion.article>
-          ))}
-        </div>
-      </motion.div>
 
-      {sortedPosts.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="card-double-bezel text-center py-16"
-        >
-          <div className="rounded-xl bg-surface/50 backdrop-blur-xl border border-border/50 p-8">
-            <MessageSquare className="h-16 w-16 mx-auto text-text-muted mb-4" aria-hidden="true" />
-            <h3 className="text-heading-md font-semibold text-foreground mb-2">No posts found</h3>
-            <p className="text-text-secondary mb-6">Try adjusting your filters or be the first to ask a question!</p>
-            <Button onClick={() => setCreatingPost(true)}>
-              <MessageSquare className="h-4 w-4" aria-hidden="true" />
-              Create First Post
+                <h3 className="font-bold text-white text-base sm:text-lg mb-1.5 group-hover:text-purple-400 transition-colors">
+                  {post.title}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                  {truncate(post.content, 180)}
+                </p>
+
+                <div className="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-700/40">
+                  <span className="flex items-center gap-1 font-semibold text-purple-400">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    {post._count.answers} answers
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    {post.upvotes} votes
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </motion.article>
+        ))}
+
+        {sortedPosts.length === 0 && (
+          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 p-12 text-center">
+            <MessageSquare className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+            <h3 className="text-white font-bold text-lg mb-1">No forum posts found</h3>
+            <p className="text-slate-400 text-sm mb-4">Try clearing search filters or create a new question.</p>
+            <Button onClick={() => setCreatingPost(true)} className="bg-purple-600 hover:bg-purple-700">
+              Post Question
             </Button>
           </div>
-        </motion.div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
+
+export default ForumClient;
