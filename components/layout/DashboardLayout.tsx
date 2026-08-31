@@ -251,10 +251,17 @@ export function DashboardLayout({ children, user, isAdmin }: DashboardLayoutProp
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-[#F05438] border border-[#F05438]/20 text-xs font-bold font-mono">
-              <Users className="w-3.5 h-3.5" />
-              eYRC#1051
-            </span>
+            {user?.team?.code ? (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-[#F05438] border border-[#F05438]/20 text-xs font-bold font-mono">
+                <Users className="w-3.5 h-3.5" />
+                {user.team.code}
+              </span>
+            ) : (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 text-xs font-bold font-mono">
+                <Users className="w-3.5 h-3.5" />
+                Unassigned
+              </span>
+            )}
 
             <ThemeToggle />
 

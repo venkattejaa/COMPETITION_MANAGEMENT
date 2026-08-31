@@ -95,7 +95,7 @@ export function PreferencesClient({ themes, userTeam, isTeamLeader }: Preference
             Task 0: Theme Selection
           </h1>
           <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mt-0.5">
-            Select 2 theme preferences for Team {userTeam?.code || "eYRC#1051"}
+            Select 2 theme preferences for Team {userTeam?.code || "Unassigned"}
           </p>
         </div>
       </motion.div>

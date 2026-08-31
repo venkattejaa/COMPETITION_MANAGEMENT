@@ -41,7 +41,7 @@ export function DashboardClient({ user }: { user: DashboardUser }) {
           Welcome back, {user.name?.split(" ")[0]} 👋
         </h1>
         <p className="text-sm font-semibold text-slate-500 dark:text-zinc-400">
-          eYRC 2026-27 • Team {team?.code || "eYRC#1051"}
+          eYRC 2026-27 • Team {team?.code || "Unassigned"}
         </p>
       </motion.div>
 
@@ -58,7 +58,7 @@ export function DashboardClient({ user }: { user: DashboardUser }) {
             TEAM
           </p>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-            {team?.code || "eYRC#1051"}
+            {team?.code || "Unassigned"}
           </h2>
           <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
             Student Track
